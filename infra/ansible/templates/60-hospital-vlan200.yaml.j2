@@ -1,0 +1,13 @@
+# Generated automatically by Ansible from design/network_spec.yml (SSOT)
+network:
+  version: 2
+  ethernets:
+    {{ server_data_interface }}:
+      dhcp4: false
+      addresses:
+{% for srv_key, srv in dc_servers.items() %}
+        - {{ srv.ip }}/{{ srv.prefix }}
+{% endfor %}
+      routes:
+        - to: 192.168.0.0/16
+          via: {{ (core_svi_hsrp | selectattr('vlan_id', 'equalto', 200) | first).vip }}

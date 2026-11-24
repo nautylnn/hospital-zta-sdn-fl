@@ -1,0 +1,51 @@
+name: Hospital ZTA-SDN-FL CI
+
+on:
+  push:
+    branches:
+      - main
+      - "feat/**"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-iac:
+    name: Validate SSOT, YAML, ACLs, Contracts & Ansible Syntax
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install CI validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml yamllint ansible-core
+
+      - name: Install required Ansible collections
+        run: |
+          ansible-galaxy collection install -r infra/ansible/requirements.yml
+
+      - name: Run offline SSOT, ACL & JSON contract validation
+        run: |
+          python3 scripts/validate_design.py
+
+      - name: Run yamllint on design and Ansible files
+        run: |
+          yamllint -c .yamllint.yml design/ infra/ansible/
+
+      - name: Check Ansible playbook syntax across all Step 1 playbooks
+        env:
+          ANSIBLE_CONFIG: infra/ansible/ansible.cfg
+        run: |
+          ansible-playbook -i infra/ansible/inventories/member1_local/hosts.ini --syntax-check \
+            infra/ansible/playbooks/00_reset_cisco.yml \
+            infra/ansible/playbooks/01_core_cisco.yml \
+            infra/ansible/playbooks/02_servers_base.yml \
+            infra/ansible/playbooks/99_verify_step1.yml

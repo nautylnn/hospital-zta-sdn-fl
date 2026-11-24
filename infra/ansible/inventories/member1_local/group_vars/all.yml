@@ -1,0 +1,12 @@
+---
+# Biến môi trường OOB Management cho máy Member 1 (VMware VMnet8: 192.168.139.0/24)
+oob_network: "192.168.139.0"
+oob_wildcard: "0.0.0.255"
+server_data_interface: "ens33"
+
+# Tài khoản lab mặc định (có thể ghi đè qua biến môi trường OS hoặc .env)
+ios_user: "{{ lookup('env', 'IOS_USER') | default('admin', true) }}"
+ios_password: "{{ lookup('env', 'IOS_PASSWORD') | default('eve', true) }}"
+ios_enable_password: "{{ lookup('env', 'IOS_ENABLE_PASSWORD') | default('eve', true) }}"
+server_user: "{{ lookup('env', 'SERVER_USER') | default('labadmin', true) }}"
+server_password: "{{ lookup('env', 'SERVER_PASSWORD') | default('eve', true) }}"

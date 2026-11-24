@@ -1,0 +1,37 @@
+---
+- name: "PART 0: Reset Cisco Switches ve trang thai Bootstrap ban dau (Phuc vu Demo)"
+  hosts: all_switches
+  serial: 2
+  gather_facts: no
+  vars_files:
+    - ../../../design/network_spec.yml
+
+  tasks:
+    - name: "0.1. Kiem tra ton tai flash:bootstrap.cfg"
+      cisco.ios.ios_command:
+        commands:
+          - "dir flash: | include bootstrap.cfg"
+      register: flash_check
+
+    - name: "0.2. Dam bao thiet bi da luu bootstrap.cfg truoc khi Reset"
+      ansible.builtin.assert:
+        that:
+          - "'bootstrap.cfg' in flash_check.stdout[0]"
+        fail_msg: "[STOP] {{ inventory_hostname }} chua co flash:bootstrap.cfg! Hay chay 'copy running-config flash:bootstrap.cfg' khi Switch con trang."
+
+    - name: "0.3. Khoi phuc cau hinh ve flash:bootstrap.cfg (Giu nguyen Gi0/0 OOB & SSH)"
+      cisco.ios.ios_command:
+        commands:
+          - configure replace flash:bootstrap.cfg force
+      vars:
+        ansible_command_timeout: 180
+
+    - name: "0.4. Xoa sach cac VLAN nghiep vu trong vlan.dat theo SSOT"
+      cisco.ios.ios_config:
+        lines:
+          - "no vlan {{ hospital_vlans | map(attribute='vlan_id') | join(',') }}"
+
+    - name: "0.5. Luu trang thai trang vao NVRAM"
+      cisco.ios.ios_command:
+        commands:
+          - write memory

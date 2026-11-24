@@ -1,0 +1,115 @@
+---
+- name: "PHAN 1: Xac thuc 12 VLAN & VTY Hardening tren tat ca Switch"
+  hosts: all_switches
+  gather_facts: no
+  vars_files:
+    - ../../../design/network_spec.yml
+
+  tasks:
+    - name: "1.1. Lay bang VLAN va trang thai ACL OOB_VTY_ONLY"
+      cisco.ios.ios_command:
+        commands:
+          - show vlan brief
+          - show ip interface brief
+          - "show access-lists {{ vty_access_list.name }}"
+      register: sw_out
+
+    - name: "1.2. Xac thuc du 100% ten 12 VLAN theo SSOT"
+      ansible.builtin.assert:
+        that:
+          - "item.name in sw_out.stdout[0]"
+        fail_msg: "[FAIL] {{ inventory_hostname }} thieu VLAN {{ item.vlan_id }} ({{ item.name }})!"
+      loop: "{{ hospital_vlans }}"
+
+    - name: "1.3. Xac thuc VTY Access-List {{ vty_access_list.name }} da ton tai"
+      ansible.builtin.assert:
+        that:
+          - "'permit' in sw_out.stdout[2]"
+        fail_msg: "[FAIL] {{ inventory_hostname }} chua co ACL {{ vty_access_list.name }}!"
+        success_msg: "[PASS] {{ inventory_hostname }} da co du 12 VLAN va khoa VTY OOB."
+
+
+- name: "PHAN 2: Xac thuc HSRP va Chinh sach ACL Zero-Trust tren Core Switches"
+  hosts: core_switches
+  gather_facts: no
+  vars_files:
+    - ../../../design/network_spec.yml
+
+  tasks:
+    - name: "2.1. Thu thap bang HSRP va tung ACL rieng biet"
+      cisco.ios.ios_command:
+        commands:
+          - show standby brief
+          - show ip access-lists GUEST
+          - show ip access-lists IOMT_ZTA_BASELINE
+          - show ip access-lists CLINICAL_PROTECT_OOB
+      register: core_out
+
+    - name: "2.2. Xac thuc HSRP da khoi tao tren Core"
+      ansible.builtin.assert:
+        that:
+          - "core_out.stdout[0] | length > 20"
+          - "'Active' in core_out.stdout[0] or 'Standby' in core_out.stdout[0]"
+        fail_msg: "[FAIL] {{ inventory_hostname }} chua co trang thai HSRP Active/Standby!"
+
+    - name: "2.3. Xac thuc ACL GUEST da chan toan bo giao thuc IP vao mang noi bo"
+      ansible.builtin.assert:
+        that:
+          - "'deny ip 192.168.220.0 0.0.0.255 192.168.0.0 0.0.255.255' in core_out.stdout[1]"
+          - "'deny ip 192.168.230.0 0.0.0.255 192.168.0.0 0.0.255.255' in core_out.stdout[1]"
+        fail_msg: "[FAIL] {{ inventory_hostname }} ACL GUEST van con lo hong chi chan ICMP/TCP!"
+
+    - name: "2.4. Xac thuc ACL IOMT_ZTA_BASELINE tuan thu Default-Deny (khong permit ip any any)"
+      ansible.builtin.assert:
+        that:
+          - "'permit ip any any' not in core_out.stdout[2]"
+          - "'deny ip any any' in core_out.stdout[2]"
+        fail_msg: "[FAIL] {{ inventory_hostname }} ACL IOMT_ZTA_BASELINE van cho phep permit ip any any!"
+
+    - name: "2.5. Xac thuc ACL CLINICAL_PROTECT_OOB da ton tai"
+      ansible.builtin.assert:
+        that:
+          - "'deny ip' in core_out.stdout[3]"
+        fail_msg: "[FAIL] {{ inventory_hostname }} chua co ACL CLINICAL_PROTECT_OOB!"
+        success_msg: "[PASS] {{ inventory_hostname }} dat chuan HSRP va Zero-Trust ACL."
+
+
+- name: "PHAN 3: Xac thuc dich vu & ket noi tren HOSPITAL-SERVERS"
+  hosts: hospital_servers
+  tags:
+    - servers
+  gather_facts: no
+  become: yes
+  vars_files:
+    - ../../../design/network_spec.yml
+
+  tasks:
+    - name: "3.1. Kiem tra dich vu dnsmasq & mock-iot-http dang hoat dong"
+      ansible.builtin.command: "systemctl is-active {{ item }}"
+      loop:
+        - dnsmasq
+        - mock-iot-http
+      register: svc_state
+      changed_when: false
+      failed_when: svc_state.stdout != 'active'
+
+    - name: "3.2. Lay danh sach IP tren card du lieu {{ server_data_interface }}"
+      ansible.builtin.command: "ip -4 addr show dev {{ server_data_interface }}"
+      register: nic_addrs
+      changed_when: false
+
+    - name: "3.3. Xac thuc du 4 IP Data Center (.200.10 -> .13)"
+      ansible.builtin.assert:
+        that:
+          - "item.value.ip in nic_addrs.stdout"
+        fail_msg: "[FAIL] Card {{ server_data_interface }} thieu IP {{ item.value.ip }} ({{ item.key }})!"
+      loop: "{{ dc_servers | dict2items }}"
+
+    - name: "3.4. Xac thuc Mock IoT HTTP Server tra ve ma 200"
+      ansible.builtin.uri:
+        url: "http://{{ global_settings.dhcp_server_ip }}:8080"
+        status_code: 200
+
+    - name: "3.5. Xac thuc ket noi tu HOSPITAL-SERVERS toi HSRP VIP VLAN 200"
+      ansible.builtin.command: "ping -c 2 -W 2 {{ (core_svi_hsrp | selectattr('vlan_id', 'equalto', 200) | first).vip }}"
+      changed_when: false

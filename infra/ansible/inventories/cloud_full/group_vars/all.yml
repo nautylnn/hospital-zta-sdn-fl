@@ -1,0 +1,11 @@
+---
+# Biến môi trường OOB Management cho TH1a/TH2 (Cloud1 nội bộ pnet1 + Tailscale Subnet Router)
+oob_network: "10.99.0.0"
+oob_wildcard: "0.0.0.255"
+server_data_interface: "ens33"
+
+ios_user: "{{ lookup('env', 'IOS_USER') | default('admin', true) }}"
+ios_password: "{{ lookup('env', 'IOS_PASSWORD') | default('eve', true) }}"
+ios_enable_password: "{{ lookup('env', 'IOS_ENABLE_PASSWORD') | default('eve', true) }}"
+server_user: "{{ lookup('env', 'SERVER_USER') | default('labadmin', true) }}"
+server_password: "{{ lookup('env', 'SERVER_PASSWORD') | default('eve', true) }}"

@@ -1,0 +1,112 @@
+---
+- name: "Buoc 1 - Tu dong hoa cau hinh VM HOSPITAL-SERVERS (Netplan, dnsmasq, Docker, Mock IoT)"
+  hosts: hospital_servers
+  gather_facts: yes
+  become: yes
+  vars_files:
+    - ../../../design/network_spec.yml
+
+  handlers:
+    - name: Apply netplan configuration
+      ansible.builtin.command: netplan apply
+      changed_when: true
+
+    - name: Restart dnsmasq
+      ansible.builtin.service:
+        name: dnsmasq
+        state: restarted
+
+    - name: Reload systemd and restart mock-iot-http
+      ansible.builtin.systemd:
+        name: mock-iot-http
+        daemon_reload: yes
+        state: restarted
+        enabled: yes
+
+  tasks:
+    - name: "1. Cap nhat apt cache va cai dat goi nen (dnsmasq, docker, cong cu mang)"
+      ansible.builtin.apt:
+        name:
+          - dnsmasq
+          - python3
+          - python3-pip
+          - docker.io
+          - docker-compose-v2
+          - tcpdump
+          - curl
+        state: present
+        update_cache: yes
+
+    - name: "2. Them user quan tri vao nhom docker"
+      ansible.builtin.user:
+        name: "{{ server_user }}"
+        groups: docker
+        append: yes
+
+    - name: "3. Bat va khoi dong dich vu Docker"
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: "4. Trien khai cau hinh Netplan cho 4 IP Data Center (.200.10 -> .13)"
+      ansible.builtin.template:
+        src: ../templates/60-hospital-vlan200.yaml.j2
+        dest: /etc/netplan/60-hospital-vlan200.yaml
+        owner: root
+        group: root
+        mode: "0600"
+      notify: Apply netplan configuration
+
+    - name: "5. Ep ap dung Netplan ngay neu file vua thay doi de cac dich vu bind IP duoc"
+      ansible.builtin.meta: flush_handlers
+
+    - name: "6. Trien khai /etc/dnsmasq.conf tu SSOT cho toan bo VLAN benh vien"
+      ansible.builtin.template:
+        src: ../templates/dnsmasq.conf.j2
+        dest: /etc/dnsmasq.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart dnsmasq
+
+    - name: "7. Dam bao dnsmasq dang chay va khoi dong cung he thong"
+      ansible.builtin.service:
+        name: dnsmasq
+        state: started
+        enabled: yes
+
+    - name: "8. Tao thu muc & trang kiem thu cho Mock IoT HTTP Server (.200.12:8080)"
+      ansible.builtin.file:
+        path: /opt/hospital-mock-iot
+        state: directory
+        mode: "0755"
+
+    - name: "9. Tao file trang thai JSON/HTML tai /opt/hospital-mock-iot/index.html"
+      ansible.builtin.copy:
+        dest: /opt/hospital-mock-iot/index.html
+        mode: "0644"
+        content: |
+          {"service": "hospital-mock-iot", "server_ip": "{{ global_settings.dhcp_server_ip }}", "status": "ok"}
+
+    - name: "10. Cai dat systemd service cho Mock IoT HTTP Server"
+      ansible.builtin.template:
+        src: ../templates/mock-iot-http.service.j2
+        dest: /etc/systemd/system/mock-iot-http.service
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload systemd and restart mock-iot-http
+
+    - name: "11. Dam bao service mock-iot-http dang chay"
+      ansible.builtin.meta: flush_handlers
+
+    - name: "12. Kiem tra HTTP 200 tren {{ global_settings.dhcp_server_ip }}:8080"
+      ansible.builtin.uri:
+        url: "http://{{ global_settings.dhcp_server_ip }}:8080"
+        status_code: 200
+        return_content: yes
+      register: mock_http_check
+      retries: 3
+      delay: 2
+      until: mock_http_check.status == 200

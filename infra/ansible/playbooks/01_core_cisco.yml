@@ -1,0 +1,120 @@
+---
+- name: "PHAN 1: Trien khai VLAN, Trunk, Access va Khoa SSH OOB tren TOAN BO SWITCH"
+  hosts: all_switches
+  gather_facts: no
+  vars_files:
+    - ../../../design/network_spec.yml
+
+  tasks:
+    - name: "1.1. Dong bo danh sach 12 VLAN chuan Idempotent tu SSOT"
+      cisco.ios.ios_vlans:
+        config: "{{ hospital_vlans }}"
+        state: merged
+
+    - name: "1.2. Cau hinh cac cong 802.1Q Trunk (Co lap VLAN 210 DMZ & 999 OOB)"
+      cisco.ios.ios_config:
+        lines:
+          - "description {{ item.description }}"
+          - switchport trunk encapsulation dot1q
+          - switchport mode trunk
+          - "switchport trunk allowed vlan {{ global_settings.trunk_allowed_vlans }}"
+          - no shutdown
+        parents: "interface {{ item.port }}"
+      loop: "{{ switch_port_profiles[inventory_hostname].trunks | default([]) }}"
+
+    - name: "1.3. Cau hinh cac cong Access cho Cac Tang, Server, DMZ va Thiet bi IoMT"
+      cisco.ios.ios_config:
+        lines:
+          - "description {{ item.description }}"
+          - switchport mode access
+          - "switchport access vlan {{ item.vlan }}"
+          - spanning-tree portfast
+          - no shutdown
+        parents: "interface {{ item.port }}"
+      loop: "{{ switch_port_profiles[inventory_hostname].access | default([]) }}"
+
+    - name: "1.4. Tao Standard ACL {{ vty_access_list.name }} gioi han truy cap SSH"
+      cisco.ios.ios_config:
+        lines: "{{ vty_access_list.lines }}"
+        parents: "ip access-list standard {{ vty_access_list.name }}"
+        before: "no ip access-list standard {{ vty_access_list.name }}"
+        match: exact
+
+    - name: "1.5. Ap dung ACL len line vty 0 15 (Chi cho phep OOB & Tailscale)"
+      cisco.ios.ios_config:
+        lines:
+          - "access-class {{ vty_access_list.name }} in"
+        parents: "line vty 0 15"
+
+
+- name: "PHAN 2: Trien khai L3 Routing, HSRP Active/Active & ACL Zero-Trust tren CORE SWITCHES"
+  hosts: core_switches
+  gather_facts: no
+  vars_files:
+    - ../../../design/network_spec.yml
+
+  tasks:
+    - name: "2.1. Bat IP Routing va Can bang tai Spanning-Tree PVST Root Bridge"
+      cisco.ios.ios_config:
+        lines:
+          - ip routing
+          - "spanning-tree mode {{ global_settings.stp_mode }}"
+          - "spanning-tree vlan {{ stp_load_balancing[inventory_hostname].root_primary_vlans }} priority 24576"
+          - "spanning-tree vlan {{ stp_load_balancing[inventory_hostname].root_secondary_vlans }} priority 28672"
+
+    - name: "2.2. Nap Extended ACL (GUEST, IOMT_ZTA_BASELINE, CLINICAL_PROTECT_OOB)"
+      cisco.ios.ios_config:
+        lines: "{{ item.value }}"
+        parents: "ip access-list extended {{ item.key }}"
+        before: "no ip access-list extended {{ item.key }}"
+        match: exact
+      loop: "{{ security_acls | dict2items }}"
+
+    - name: "2.3. Cau hinh SVI co ban + HSRP Active/Active tren Core Switch"
+      cisco.ios.ios_config:
+        lines:
+          - "ip address {{ item.core1_ip if inventory_hostname == 'SW-CORE-01' else item.core2_ip }} {{ item.netmask }}"
+          - "standby {{ item.hsrp_group }} ip {{ item.vip }}"
+          - "standby {{ item.hsrp_group }} priority {{ item.core1_priority if inventory_hostname == 'SW-CORE-01' else item.core2_priority }}"
+          - "standby {{ item.hsrp_group }} preempt"
+          - no shutdown
+        parents: "interface Vlan{{ item.vlan_id }}"
+      loop: "{{ core_svi_hsrp }}"
+
+    - name: "2.4. Gan DHCP Relay (ip helper-address) cho cac SVI co khai bao"
+      cisco.ios.ios_config:
+        lines:
+          - "ip helper-address {{ item.dhcp_helper }}"
+        parents: "interface Vlan{{ item.vlan_id }}"
+      loop: "{{ core_svi_hsrp }}"
+      when: item.dhcp_helper is defined
+
+    - name: "2.5. Gan ACL Inbound bao ve cho cac SVI tuong ung"
+      cisco.ios.ios_config:
+        lines:
+          - "ip access-group {{ item.acl_in }} in"
+        parents: "interface Vlan{{ item.vlan_id }}"
+      loop: "{{ core_svi_hsrp }}"
+      when: item.acl_in is defined
+
+    - name: "2.6. Cau hinh cong L3 Uplink len Firewall U3 (NGFW)"
+      cisco.ios.ios_config:
+        lines:
+          - no switchport
+          - "ip address {{ core_l3_uplinks[inventory_hostname].ip }} {{ core_l3_uplinks[inventory_hostname].netmask }}"
+          - no shutdown
+        parents: "interface {{ core_l3_uplinks[inventory_hostname].uplink_port }}"
+
+    - name: "2.7. Cau hinh Default Route tro ve Firewall U3"
+      cisco.ios.ios_config:
+        lines:
+          - "ip route 0.0.0.0 0.0.0.0 {{ core_l3_uplinks[inventory_hostname].next_hop_firewall }}"
+
+
+- name: "PHAN 3: Luu toan bo cau hinh vao NVRAM (Write Memory)"
+  hosts: all_switches
+  gather_facts: no
+  tasks:
+    - name: "3.1. Luu cau hinh neu co bat ky su thay doi nao"
+      cisco.ios.ios_config:
+        save_when: modified

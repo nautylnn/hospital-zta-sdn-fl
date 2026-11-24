@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hospital-zta-sdn-fl.local/schemas/enforcement.schema.json",
+  "title": "ZTAEnforcementAction",
+  "description": "Policy enforcement payload issued by ZTA Policy Administrator (Server 1) to SDN Controller (OS-Ken/Ryu) or fallback PEP.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "decision",
+    "switch_dpid",
+    "match_mac",
+    "match_ip",
+    "vlan_id",
+    "ttl_seconds",
+    "priority",
+    "reason",
+    "alert_id"
+  ],
+  "properties": {
+    "decision": {
+      "type": "string",
+      "enum": ["ALLOW", "RATE_LIMIT", "QUARANTINE", "RELEASE"],
+      "description": "ZTA Policy Engine verdict translated into a concrete PEP action."
+    },
+    "switch_dpid": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{16}$",
+      "description": "Target OVS PEP OpenFlow Datapath ID."
+    },
+    "match_mac": {
+      "type": "string",
+      "pattern": "^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$",
+      "description": "Source MAC address to match in OpenFlow L2/L3 drop or rate-limit rule."
+    },
+    "match_ip": {
+      "type": "string",
+      "format": "ipv4",
+      "description": "Source IPv4 address to match in OpenFlow rule."
+    },
+    "vlan_id": {
+      "type": "integer",
+      "enum": [10, 20, 30, 60, 70, 80, 200, 210, 220, 230, 300],
+      "description": "VLAN scope of the enforcement rule."
+    },
+    "ttl_seconds": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 86400,
+      "description": "OpenFlow hard_timeout in seconds (0 only for explicit ALLOW or RELEASE)."
+    },
+    "priority": {
+      "type": "integer",
+      "minimum": 100,
+      "maximum": 65535,
+      "description": "OpenFlow rule priority (quarantine rules must outrank normal forwarding flows)."
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 256,
+      "description": "Human-readable audit reason recorded to Wazuh SIEM."
+    },
+    "alert_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Correlating EdgeFLAlert UUID that triggered this enforcement."
+    }
+  }
+}

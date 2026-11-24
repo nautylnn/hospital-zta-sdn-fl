@@ -1,0 +1,12 @@
+# Generated automatically by Ansible from design/network_spec.yml (SSOT)
+listen-address={{ global_settings.dhcp_server_ip }}
+bind-interfaces
+domain-needed
+bogus-priv
+
+{% for svi in core_svi_hsrp if svi.dhcp_pool_start is defined and svi.dhcp_pool_end is defined %}
+# VLAN {{ svi.vlan_id }}
+dhcp-range=vlan{{ svi.vlan_id }},{{ svi.dhcp_pool_start }},{{ svi.dhcp_pool_end }},{{ svi.netmask }},12h
+dhcp-option=vlan{{ svi.vlan_id }},3,{{ svi.vip }}
+
+{% endfor %}

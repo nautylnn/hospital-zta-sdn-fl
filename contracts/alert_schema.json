@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hospital-zta-sdn-fl.local/schemas/alert.schema.json",
+  "title": "EdgeFLAlert",
+  "description": "Authenticated intrusion detection alert sent from Edge FL-IDS (Edge A/B/IoMT) to Server 1 ZTA Policy Engine.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "alert_id",
+    "timestamp",
+    "edge_id",
+    "switch_dpid",
+    "src_mac",
+    "src_ip",
+    "dst_ip",
+    "vlan_id",
+    "attack_type",
+    "confidence",
+    "model_round"
+  ],
+  "properties": {
+    "alert_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for tracing this alert through ZTA PE, SDN PEP, and Wazuh SIEM."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC timestamp when Edge AI detected the anomaly (used as t1 in IPS response-time benchmark)."
+    },
+    "edge_id": {
+      "type": "string",
+      "enum": ["edge-a", "edge-b", "edge-iomt"],
+      "description": "Identifier of the Edge FL-IDS node generating the alert."
+    },
+    "switch_dpid": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{16}$",
+      "description": "16-hex-char OpenFlow Datapath ID of the OVS PEP monitoring this segment."
+    },
+    "src_mac": {
+      "type": "string",
+      "pattern": "^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$",
+      "description": "Source MAC address of the suspected attacker or compromised endpoint."
+    },
+    "src_ip": {
+      "type": "string",
+      "format": "ipv4",
+      "description": "Source IPv4 address observed in the mirrored flow."
+    },
+    "dst_ip": {
+      "type": "string",
+      "format": "ipv4",
+      "description": "Destination IPv4 address targeted by the flow."
+    },
+    "vlan_id": {
+      "type": "integer",
+      "enum": [10, 20, 30, 60, 70, 80, 200, 210, 220, 230, 300],
+      "description": "VLAN where the flow originated."
+    },
+    "attack_type": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 64,
+      "description": "Predicted attack class from Edge-IIoTset / TON_IoT taxonomy (e.g., DDoS_TCP_Flood, Port_Scan, MITM)."
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Model softmax probability for the predicted attack class."
+    },
+    "model_round": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Current Flower Global Model round loaded on this Edge node."
+    },
+    "features_summary": {
+      "type": "object",
+      "description": "Optional summary of key flow features (packet_rate, byte_count, duration_ms) for SIEM/audit logging.",
+      "additionalProperties": {
+        "type": ["number", "string", "integer"]
+      }
+    }
+  }
+}

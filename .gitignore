@@ -1,0 +1,43 @@
+# Environment & Secrets
+.env
+*.env
+!.env.example
+*.key
+*.pem
+*.crt
+*.p12
+
+# Ansible
+*.retry
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+
+# Logs & Captures
+*.log
+*.pcap
+*.pcapng
+
+# VM Images & Heavy Binaries
+*.qcow2
+*.vmdk
+*.vdi
+*.ova
+*.iso
+*.img
+
+# Datasets & Model Checkpoints
+data/raw/
+*.pt
+*.pth
+*.onnx
+
+# OS / Editor Artifacts
+.DS_Store
+Thumbs.db
+.vscode/*.log
