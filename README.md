@@ -78,21 +78,56 @@ Trên Linux / WSL:
 make validate
 ```
 
-### B. Cài đặt Control Node (Ubuntu WSL 1 hoặc Linux)
+### B. Chọn 1 trong 2 cách thiết lập Control Node chạy Ansible
 
-> **Lưu ý trên Windows chạy VMware Workstation:** Dùng **Ubuntu WSL 1** (không bật WSL 2/Hyper-V) để tránh xung đột Nested Virtualization với EVE-NG.
+#### Cách 1 (Khuyên dùng cho mọi máy Windows/VMware — Không cần cài WSL 1)
+Dùng chính VM **Ubuntu Server 24.04 (`HOSPITAL-SERVERS`)** làm nơi chạy Ansible + Docker (tránh hoàn toàn xung đột Hyper-V/WSL 2 với VMware Workstation và chạy được cả Bước 2–5 trên cùng 1 VM):
+
+1. Tạo VM `HOSPITAL-SERVERS` (`2 vCPU`, `2 GB RAM`, `20 GB Disk`, tích chọn `Install OpenSSH server`), gắn 2 card mạng:
+   - Card 1 (`ens33`): `Custom -> VMnet2` (Host-only, tắt DHCP — nối vào `Cloud1` / `VLAN 200`).
+   - Card 2 (`ens34`): `NAT` (`VMnet8` — có Internet và chung dải quản trị OOB với EVE-NG).
+2. Xem IP quản trị của VM (`ip -4 a show ens34`), rồi SSH từ Windows PowerShell vào (`ssh labadmin@<IP_ENS34>`) và cài môi trường 1 lần:
 
 ```bash
+sudo apt update && sudo apt install -y git make python3-venv python3-pip sshpass
+git clone <URL_REPO_GITHUB_CUA_NHOM> ~/hospital-zta-sdn-fl
+cd ~/hospital-zta-sdn-fl
+
+python3 -m venv ~/iac_venv
+source ~/iac_venv/bin/activate
+pip install --upgrade pip
+pip install "paramiko<4.0" ansible netmiko pyyaml yamllint
+ansible-galaxy collection install -r infra/ansible/requirements.yml
+```
+
+#### Cách 2 (Dành cho máy đã cài sẵn Ubuntu WSL 1 như Member 1)
+> **Lưu ý:** Chỉ bật tính năng `Windows Subsystem for Linux` (**WSL 1**), **tuyệt đối không bật `VirtualMachinePlatform` / WSL 2 / Hyper-V** để tránh VMware EVE-NG bị lỗi `VT-x/EPT`.
+
+```bash
+sudo apt update && sudo apt install -y git make python3-venv python3-pip sshpass
+git clone <URL_REPO_GITHUB_CUA_NHOM> ~/hospital-zta-sdn-fl
+cd ~/hospital-zta-sdn-fl
+
 python3 -m venv ~/iac_venv
 source ~/iac_venv/bin/activate
 pip install "paramiko<4.0" ansible netmiko pyyaml yamllint
 ansible-galaxy collection install -r infra/ansible/requirements.yml
 ```
 
-### C. Chạy triển khai & kiểm thử trên Lab thật (chọn `ENV=member1_local`, `lead_lite` hoặc `cloud_full`)
+> **Lưu ý cho Member 1 nếu user trên VM `HOSPITAL-SERVERS` không phải `labadmin` (ví dụ `lemin`):**
+> - Các lệnh chỉ SSH vào 7 Switch Cisco (`make check-lab`, `make reset-cisco`, `make deploy-core`) **không cần** đổi user.
+> - Các lệnh cấu hình/kiểm tra `HOSPITAL-SERVERS` (`make deploy-servers`, `make deploy-step1`, `make verify-step1`) cần đặt trước biến môi trường **`export SERVER_USER=lemin`** trong phiên terminal đó (hoặc truyền `SERVER_USER=lemin make ...`).
+
+### C. Cập nhật IP & Chạy triển khai / kiểm thử trên Lab thật
+
+1. Mở `infra/ansible/inventories/<profile>/hosts.ini` (`member1_local`, `lead_lite`, hoặc `cloud_full`), sửa dòng `HOSPITAL-SERVERS ansible_host=...` cho khớp với **IP của card `ens34`** trên VM `HOSPITAL-SERVERS` (xem bằng lệnh `ip -4 a show ens34`).
+2. Kích hoạt `source ~/iac_venv/bin/activate` trong `~/hospital-zta-sdn-fl` và chạy theo profile tương ứng:
 
 ```bash
-# 1. Kiểm tra Ping, SSH & HSRP tới toàn bộ thiết bị trong profile
+# Nếu user VM HOSPITAL-SERVERS khác 'labadmin' (ví dụ Member 1 dùng 'lemin'):
+# export SERVER_USER=lemin
+
+# 1. Kiểm tra Ping, SSH & HSRP tới các Switch trong profile
 make check-lab ENV=member1_local
 
 # 2. Kiểm tra cú pháp toàn bộ Ansible Playbook
@@ -104,9 +139,29 @@ make reset-cisco ENV=member1_local
 # 4. Triển khai toàn bộ Core Cisco + cấu hình tự động HOSPITAL-SERVERS
 make deploy-step1 ENV=member1_local
 
+# (Hoặc chỉ test riêng phần cấu hình HOSPITAL-SERVERS khi chưa nạp image Cisco):
+# make deploy-servers ENV=lead_lite
+
 # 5. Chạy bộ kiểm thử xác thực tự động Switch + ACL + Server
 make verify-step1 ENV=member1_local
 ```
+
+### D. Xử lý nhanh 3 lỗi thực tế thường gặp ở Bước 1
+
+1. **`apt` tải rất chậm trên `vn.archive.ubuntu.com`:** Đổi mirror về máy chủ nhanh trong nước rồi cài lại:
+   ```bash
+   sudo sed -i 's/vn\.archive\.ubuntu\.com/mirror.bizflycloud.vn/g' /etc/apt/sources.list.d/ubuntu.sources
+   sudo apt update
+   ```
+2. **Lỗi `dpkg frontend lock` / `Waiting for cache lock` (do `unattended-upgrades` chạy ngầm khi mới cài Ubuntu):**
+   ```bash
+   sudo systemctl stop unattended-upgrades
+   sudo dpkg --configure -a
+   ```
+3. **Lỗi `/usr/bin/env: 'bash\r': No such file or directory` khi chạy `make check-lab`:**
+   ```bash
+   sed -i 's/\r$//' scripts/check_lab.sh
+   ```
 
 ---
 
@@ -128,7 +183,8 @@ Sau khi push, mở tab **Actions** trên GitHub để xác nhận workflow `Hosp
 ## 5. Checklist Nghiệm thu Bước 1 (Definition of Done)
 
 - [x] `py scripts/validate_design.py` đạt `ALL CHECKS PASSED (0 failures)` offline.
+- [x] `make deploy-servers ENV=lead_lite` chạy thực tế thành công trên `HOSPITAL-SERVERS` (`ok=14 changed=11 failed=0`, `dnsmasq` + `HTTP 200` `:8080`).
 - [ ] Export file `.unl` từ EVE-NG đặt vào `infra/eveng/` (Member 1 thực hiện).
-- [ ] Chạy `make deploy-step1 ENV=<profile>` và `make verify-step1 ENV=<profile>` trên lab thật đạt `failed=0`.
+- [ ] Chạy `make deploy-step1 ENV=<profile>` và `make verify-step1 ENV=<profile>` trên đủ 7 Switch Cisco đạt `failed=0`.
 - [ ] Kiểm thử trên `VPCS`: Guest (`VLAN 230`) **không** ping/TCP/UDP được sang Bác sĩ (`VLAN 10`) và Data Center (`VLAN 200`); IoMT (`VLAN 300`) truy cập được `.200.12:8080` nhưng bị chặn sang Bác sĩ, OOB và Internet; HSRP failover hoạt động khi tắt `SW-CORE-01`.
 - [ ] GitHub Actions CI chạy xanh trên nhánh `main`.
