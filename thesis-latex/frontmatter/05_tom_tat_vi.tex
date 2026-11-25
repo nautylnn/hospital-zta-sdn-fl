@@ -1,0 +1,15 @@
+\frontchapter{Tóm tắt}
+
+Mạng bệnh viện hiện đại kết nối nhiều loại thiết bị đa dạng giữa các khoa lâm sàng, hệ thống chẩn đoán hình ảnh, thiết bị Y tế Kết nối (IoMT), cụm máy chủ nội bộ (HIS, PACS, LIS) và cổng thông tin bệnh nhân tại vùng DMZ. Các mô hình bảo mật truyền thống dựa trên vành đai tường lửa tĩnh và sự tin cậy mặc định bên trong mạng nội bộ không còn đủ khả năng ngăn chặn sự lây lan ngang (lateral movement) khi một thiết bị đầu cuối bị xâm nhập. Bên cạnh đó, việc thu thập tập trung dữ liệu lưu lượng mạng để huấn luyện các mô hình Học sâu phát hiện xâm nhập đặt ra rủi ro lớn về quyền riêng tư dữ liệu bệnh nhân và gây quá tải băng thông đường truyền.
+
+Để giải quyết bài toán trên, luận văn này đề xuất thiết kế và hiện thực một \textbf{Hệ thống Phát hiện và Ngăn chặn Xâm nhập dựa trên Học liên kết (Federated Learning), kết hợp Kiến trúc Không tin cậy (Zero Trust Architecture) và Mạng Điều khiển bằng Phần mềm (SDN)} cho hạ tầng mạng bệnh viện. Hệ thống được tổ chức theo ba lớp gắn kết chặt chẽ:
+\begin{enumerate}[leftmargin=1.8em, itemsep=4pt]
+  \item \textbf{Hạ tầng mạng bệnh viện phân mảnh theo hướng Infrastructure as Code (IaC):} Xây dựng kiến trúc mạng Campus ba tầng (Core, Distribution, Access) với phân chia VLAN chặt chẽ theo từng phân khu (Lâm sàng, Cận lâm sàng, Máy chủ, DMZ, Quản trị Out-of-Band), cô lập VRF và tự động hóa triển khai qua NetBox, Terraform và Ansible.
+  \item \textbf{Thực thi Zero Trust và điều khiển SDN:} Tích hợp tường lửa ứng dụng Web OWASP CRS tại DMZ, hệ thống phát hiện xâm nhập Suricata thông qua cơ chế nhân bản lưu lượng SPAN, kết hợp với bộ điều khiển SDN đóng vai trò điểm quyết định chính sách (PDP) để tự động cô lập thiết bị bất thường theo thời gian thực.
+  \item \textbf{Phát hiện xâm nhập bảo toàn riêng tư bằng Học liên kết (FL-IDS):} Huấn luyện mô hình học sâu cục bộ tại các nút biên (DMZ, Lâm sàng, Cận lâm sàng) và chỉ chia sẻ tham số trọng số về máy chủ tổng hợp thông qua giao thức FedAvg, đảm bảo dữ liệu thô không rời khỏi phân vùng cục bộ.
+\end{enumerate}
+
+Hệ thống hướng đến một vòng lặp bảo mật khép kín từ giám sát lưu lượng, phát hiện bất thường đến tự động cách ly luồng độc hại, đạt mục tiêu độ chính xác phát hiện cao ($>95\%$ trong kịch bản đánh giá ở Chương~5), tỷ lệ cảnh báo giả thấp và thời gian phản ứng nhanh trong khi vẫn đảm bảo an toàn thông tin y tế.
+
+\vspace{0.5cm}
+\noindent\textbf{Từ khóa:} Bảo mật mạng bệnh viện, Kiến trúc Không tin cậy (ZTA), Mạng Điều khiển bằng Phần mềm (SDN), Học liên kết (FL), Hệ thống Phát hiện và Ngăn chặn Xâm nhập (IDS/IPS), Infrastructure as Code (IaC).

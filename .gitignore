@@ -41,3 +41,15 @@ data/raw/
 .DS_Store
 Thumbs.db
 .vscode/*.log
+
+# LaTeX Build Artifacts (keep .tex, .cls, .bib and compiled main.pdf)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.synctex.gz
+*.toc

@@ -1,0 +1,38 @@
+\chapter{Theoretical Background and Hospital Infrastructure Design}
+\label{ch:theoretical_background}
+
+% [TODO - Chapter Owner: Member 1 & Lead]
+% Write full prose expanding each subsection below based on verified repository artifacts
+% (ansible/, terraform/, netbox/, topology) and references.bib citations.
+
+\section{Hospital Network Characteristics and Security Challenges}
+\label{sec:hospital_challenges}
+% Cover HIS, EMR, PACS, LIS, IoMT endpoints, HIPAA/data-privacy requirements, and
+% risks of lateral movement under flat or perimeter-only network topologies.
+
+\section{Zero Trust Architecture (NIST SP 800-207)}
+\label{sec:zta_theory}
+% Cover ZTA core tenets, Policy Engine / Policy Administrator (PDP), Policy Enforcement
+% Point (PEP), trust algorithms, and micro-segmentation principles (\cite{rose2020zerotrust}).
+
+\section{Software-Defined Networking (SDN)}
+\label{sec:sdn_theory}
+% Cover decoupling of control and data planes, OpenFlow southbound protocol, Open vSwitch
+% (OVS), SDN controller (Ryu/Faucet), and programmable flow rules (\cite{onfSdnDefinition,xu2025zero}).
+
+\section{Intrusion Detection, Prevention, and Web Application Firewalls}
+\label{sec:ids_waf_theory}
+% Cover signature vs. anomaly-based IDS/IPS, Suricata inspection over SPAN/RSPAN mirroring
+% (\cite{ciscoSpan,suricataIpsConcept}), and OWASP ModSecurity CRS (\cite{owasp2026crs}).
+
+\section{Federated Learning Foundations}
+\label{sec:fl_theory}
+% Cover FedAvg (\cite{mcmahan2017communication}), client-server aggregation rounds, non-IID
+% departmental data distributions, and privacy advantages in FL-IDS (\cite{javeed2024federated,amiri2023sids}).
+
+\section{Hospital Campus Network Architecture and IaC Implementation}
+\label{sec:campus_iac_design}
+% Detail our implemented 3-tier Campus topology (Core, Distribution, Access, Cisco ASAv),
+% VRF isolation, Clinical/Paraclinical/Server/DMZ/SDN/OOB VLANs, two-layer OOB protection
+% (CLINICAL_PROTECT_OOB & OOB_VTY_ONLY), and NetBox/Terraform/Ansible automation pipelines
+% (\cite{ciscoCampusArchitecture,ciscoHealthcareProfile}).

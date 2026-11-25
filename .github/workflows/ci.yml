@@ -44,8 +44,11 @@ jobs:
         env:
           ANSIBLE_CONFIG: infra/ansible/ansible.cfg
         run: |
-          ansible-playbook -i infra/ansible/inventories/member1_local/hosts.ini --syntax-check \
-            infra/ansible/playbooks/00_reset_cisco.yml \
-            infra/ansible/playbooks/01_core_cisco.yml \
-            infra/ansible/playbooks/02_servers_base.yml \
-            infra/ansible/playbooks/99_verify_step1.yml
+          for profile in member1_local member2_local lead_lite cloud_full; do
+            echo "Checking syntax with inventory: ${profile}"
+            ansible-playbook -i "infra/ansible/inventories/${profile}/hosts.ini" --syntax-check \
+              infra/ansible/playbooks/00_reset_cisco.yml \
+              infra/ansible/playbooks/01_core_cisco.yml \
+              infra/ansible/playbooks/02_servers_base.yml \
+              infra/ansible/playbooks/99_verify_step1.yml
+          done

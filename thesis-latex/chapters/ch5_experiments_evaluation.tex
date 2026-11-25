@@ -1,0 +1,31 @@
+\chapter{Experiments and Evaluation}
+\label{ch:experiments_evaluation}
+
+% [TODO - Chapter Owner: Full Team]
+% Populate all experimental setup tables, confusion matrices, ROC/accuracy curves, latency
+% measurements, and ablation comparisons once Phase 2 & Phase 3 testbed runs are complete.
+
+\section{Experimental Testbed and Attack Scenarios}
+\label{sec:testbed_scenarios}
+% Document hardware/VM specs (VMware, GNS3, OVS, Ubuntu servers), traffic generators, and
+% test scenarios (port scan, SSH brute-force, SQLi/XSS against Patient Portal, lateral pivot).
+
+\section{FL-IDS Classification Performance}
+\label{sec:eval_fl_metrics}
+% [TODO] Report Accuracy (target benchmark >95%), Precision, Recall, F1-Score, FPR, and
+% per-class confusion matrices comparing Centralized vs. Local-Only vs. FedAvg training.
+
+\section{Federated Convergence and Resource Overhead}
+\label{sec:eval_convergence}
+% [TODO] Measure global loss/accuracy across FedAvg rounds under IID and non-IID zone splits,
+% CPU/RAM footprint on edge VMs, and model weight transmission overhead.
+
+\section{ZTA-SDN Enforcement Latency and Mitigation Effectiveness}
+\label{sec:eval_sdn_latency}
+% [TODO] Measure detection-to-quarantine latency (t_detect -> t_pdp -> t_openflow),
+% throughput impact on benign HIS/PACS flows, and verification of OOB/VRF isolation.
+
+\section{Comparison with Existing Approaches}
+\label{sec:eval_comparison}
+% [TODO] Benchmark qualitatively and quantitatively against related works
+% (\cite{javeed2024federated,xu2025zero,alanazi2026edgeguard,amiri2023sids}).

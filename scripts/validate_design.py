@@ -142,8 +142,8 @@ def check_security_acls() -> str:
 
 
 def check_inventories() -> str:
-    """Verify all 3 environment profiles contain hosts.ini and required group_vars."""
-    profiles = ("member1_local", "lead_lite", "cloud_full")
+    """Verify all 4 environment profiles contain hosts.ini and required group_vars."""
+    profiles = ("member1_local", "member2_local", "lead_lite", "cloud_full")
     required_vars = {"oob_network", "oob_wildcard", "server_data_interface", "ios_user", "server_user"}
     inv_root = REPO_ROOT / "infra" / "ansible" / "inventories"
 
@@ -208,7 +208,7 @@ def main() -> int:
         ("YAML Syntax", check_yaml_files),
         ("SSOT Invariants", check_ssot_invariants),
         ("Zero-Trust ACLs", check_security_acls),
-        ("Inventories (3 Profiles)", check_inventories),
+        ("Inventories (4 Profiles)", check_inventories),
         ("JSON Contracts", check_json_contracts),
         ("Path Hygiene", check_path_hygiene),
     ]

@@ -1,0 +1,89 @@
+% ============================================================================
+% main.tex - HCMUT Graduation Thesis (English-Taught / High-Quality Program)
+% Build order: pdflatex main -> bibtex main -> pdflatex main -> pdflatex main
+% ============================================================================
+\documentclass{hcmut-thesis}
+
+% --- Thesis Cover & Sub-Cover Metadata ---
+\upperuni{VIETNAM NATIONAL UNIVERSITY HO CHI MINH CITY}
+\university{HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY}
+\faculty{FACULTY OF COMPUTER SCIENCE AND ENGINEERING}
+\thesistype{GRADUATION THESIS}
+\major{MAJOR: COMPUTER ENGINEERING}
+
+\thesistitle{%
+  DESIGN AND IMPLEMENTATION OF A FEDERATED LEARNING-BASED\\
+  INTRUSION DETECTION AND PREVENTION SYSTEM\\
+  WITH ZERO TRUST ARCHITECTURE AND SDN\\
+  FOR HOSPITAL NETWORKS%
+}
+
+\advisor{Ph.D. Nguyễn Lê Duy Lai}
+
+\students{%
+  Nguyễn Đặng Minh Trường -- 2353262\\
+  Lê Minh Hào -- 2310846\\
+  Triệu Thuận Toàn -- 2353196%
+}
+
+\subcoverstudents{%
+  Nguyễn Đặng Minh Trường -- 2353262\\
+  Lê Minh Hào -- 2310846\\
+  Triệu Thuận Toàn -- 2353196%
+}
+
+\place{HO CHI MINH CITY}
+\dateyear{NOVEMBER 2026}
+
+\begin{document}
+
+% --- 1. Cover & Sub-Cover Pages ---
+\hypersetup{pageanchor=false}
+\makecoverpage
+\makesubcoverpage
+\hypersetup{pageanchor=true}
+
+% --- 2. Front Matter (Roman Numerals) ---
+\clearpage
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+\input{frontmatter/01_thesis_mission}
+\input{frontmatter/02_declaration}
+\input{frontmatter/03_acknowledgments}
+\input{frontmatter/04_abstract_en}
+\input{frontmatter/05_tom_tat_vi}
+
+\clearpage
+\tableofcontents
+\addcontentsline{toc}{chapter}{Table of Contents}
+
+\clearpage
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+
+\clearpage
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+
+\input{frontmatter/06_acronyms}
+
+% --- 3. Main Body (Arabic Numerals) ---
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\input{chapters/ch1_introduction}
+\input{chapters/ch2_theoretical_background}
+\input{chapters/ch3_fl_ids}
+\input{chapters/ch4_zta_sdn_integration}
+\input{chapters/ch5_experiments_evaluation}
+\input{chapters/ch6_conclusion}
+
+% --- 4. References ---
+\clearpage
+\addcontentsline{toc}{chapter}{References}
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

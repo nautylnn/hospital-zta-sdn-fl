@@ -1,0 +1,14 @@
+---
+# Biến môi trường OOB Management cho máy Member 2 (đổi khớp subnet VMnet8 của bạn)
+# Lưu ý: Cập nhật oob_network trùng với subnet VMnet8 để không bị tự khóa SSH
+# bởi 2 ACL CLINICAL_PROTECT_OOB và OOB_VTY_ONLY khi chạy playbook Cisco.
+oob_network: "192.168.100.0"
+oob_wildcard: "0.0.0.255"
+server_data_interface: "ens33"
+
+# Tài khoản lab mặc định (có thể ghi đè qua biến môi trường OS hoặc .env)
+ios_user: "{{ lookup('env', 'IOS_USER') | default('admin', true) }}"
+ios_password: "{{ lookup('env', 'IOS_PASSWORD') | default('eve', true) }}"
+ios_enable_password: "{{ lookup('env', 'IOS_ENABLE_PASSWORD') | default('eve', true) }}"
+server_user: "{{ lookup('env', 'SERVER_USER') | default('labadmin', true) }}"
+server_password: "{{ lookup('env', 'SERVER_PASSWORD') | default('eve', true) }}"

@@ -1,0 +1,15 @@
+\frontchapter{Abstract}
+
+Modern hospital networks interconnect heterogeneous endpoints across clinical departments, diagnostic imaging equipment, Internet of Medical Things (IoMT) sensors, enterprise servers, and public-facing patient portals. Traditional perimeter-based security architectures rely on static firewall rules and implicit internal trust, leaving healthcare infrastructures vulnerable to lateral movement once a single endpoint or medical device is compromised. Furthermore, centralizing raw clinical network traffic for Artificial Intelligence (AI)-driven intrusion detection raises significant privacy and regulatory compliance risks while introducing bandwidth bottlenecks.
+
+To address these challenges, this graduation thesis presents the design and implementation of a \textbf{Federated Learning-based Intrusion Detection and Prevention System integrated with Zero Trust Architecture and Software-Defined Networking (FL-IDS + ZTA-SDN)} for hospital networks. The proposed architecture comprises three tightly coupled layers:
+\begin{enumerate}[leftmargin=1.8em, itemsep=4pt]
+  \item \textbf{Segmented Hospital Infrastructure via Infrastructure as Code (IaC):} A three-tier Campus network topology (Core, Distribution, Access) managed with Cisco Catalyst, Nexus, and ASA platforms, featuring strict VLAN micro-segmentation across clinical, paraclinical, server farm, DMZ, and Out-of-Band (OOB) management zones, VRF isolation, and automated provisioning through NetBox, Terraform, and Ansible.
+  \item \textbf{Zero Trust Policy Enforcement and SDN Control:} Continuous verification governed by a centralized Policy Decision Point (PDP) and SDN Controller that dynamically adjusts OpenFlow rules on Policy Enforcement Points (PEPs), complemented by OWASP ModSecurity CRS at the DMZ Web Application Firewall and Suricata IDS/IPS inspecting mirrored SPAN traffic.
+  \item \textbf{Privacy-Preserving Federated Learning IDS:} Distributed local intrusion detection models trained at hospital edge zones using the FedAvg aggregation protocol, enabling collaborative multi-department threat intelligence without exposing raw sensitive traffic outside local boundaries.
+\end{enumerate}
+
+The integrated system forms a closed-loop security pipeline---from edge packet inspection and federated classification to automated SDN quarantine and micro-segmentation enforcement---aiming to achieve high detection accuracy ($>95\%$ target benchmark in Chapter~5 evaluation), low false-positive rates, and rapid automated containment while preserving patient data privacy.
+
+\vspace{0.5cm}
+\noindent\textbf{Keywords:} Hospital Network Security, Zero Trust Architecture (ZTA), Software-Defined Networking (SDN), Federated Learning (FL), Intrusion Detection and Prevention System (IDS/IPS), Infrastructure as Code (IaC).

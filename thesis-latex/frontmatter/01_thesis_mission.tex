@@ -1,0 +1,54 @@
+\frontchapter{Graduation Thesis Task Assignment}
+
+\noindent\textbf{VIETNAM NATIONAL UNIVERSITY HO CHI MINH CITY}\\
+\textbf{HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY}\\
+\textbf{FACULTY OF COMPUTER SCIENCE AND ENGINEERING}
+
+\vspace{0.5cm}
+\begin{center}
+  {\Large\bfseries GRADUATION THESIS TASK ASSIGNMENT}
+\end{center}
+\vspace{0.4cm}
+
+\noindent\textbf{1. Students:}
+\begin{itemize}[leftmargin=1.8em, nosep]
+  \item Nguyễn Đặng Minh Trường -- Student ID: 2353262 -- Major: Computer Engineering (English-Taught Program)
+  \item Lê Minh Hào -- Student ID: 2310846 -- Major: Computer Engineering (English-Taught Program)
+  \item Triệu Thuận Toàn -- Student ID: 2353196 -- Major: Computer Engineering (English-Taught Program)
+\end{itemize}
+
+\vspace{0.3cm}
+\noindent\textbf{2. Thesis Title:}\\
+\textit{Design and Implementation of a Federated Learning-Based Intrusion Detection and Prevention System with Zero Trust Architecture and SDN for Hospital Networks.}
+
+\vspace{0.3cm}
+\noindent\textbf{3. Core Objectives and Scope:}
+\begin{itemize}[leftmargin=1.8em, itemsep=4pt]
+  \item \textbf{Core Hospital Network Infrastructure (Infrastructure as Code):} Design and deploy an enterprise three-tier Campus network topology (Core, Distribution, Access) using Cisco Catalyst/Nexus/ASA platforms, strict VLAN segmentation (Clinical zones, Paraclinical zones, Server Farm, DMZ, Out-of-Band Management, and SDN Control), VRF isolation, and automated deployment via Terraform/NetBox and Ansible.
+  \item \textbf{Zero Trust Architecture \& SDN Enforcement (ZTA-SDN):} Enforce micro-segmentation across clinical, DMZ, and server zones; deploy Suricata IDS/IPS with SPAN traffic mirroring, OWASP ModSecurity CRS WAF, Policy Enforcement Points (PEPs), and an SDN Controller (Ryu/Faucet/OpenFlow) acting as the Policy Decision Point (PDP) for dynamic quarantining and flow-rule enforcement.
+  \item \textbf{Federated Learning Intrusion Detection (FL-IDS):} Design and train lightweight deep learning models (such as 1D-CNN, MLP, or CNN-BiLSTM) under Federated Learning (Flower/FedAvg) across distributed hospital edge nodes (DMZ, Clinical, Paraclinical) without centralizing raw patient-adjacent network traffic.
+  \item \textbf{Closed-Loop Integration \& Evaluation:} Couple the FL-IDS detection engine with the SDN Policy Engine and verify end-to-end attack mitigation latency, classification accuracy, and false-positive behavior under realistic hospital workloads.
+\end{itemize}
+
+\vspace{0.3cm}
+\noindent\textbf{4. Deliverables and Schedule:}
+\begin{itemize}[leftmargin=1.8em, nosep]
+  \item Hardcopy and softcopy of the Graduation Thesis report in English according to HCMUT Faculty of Computer Science and Engineering regulations.
+  \item Reproducible Infrastructure-as-Code repository, FL-IDS training/inference pipeline, ZTA-SDN policy engine, and benchmark testbed artifacts.
+  \item Assignment Issue Date: \texttt{[DD/MM/2026]} \hfill Submission Date: \texttt{[DD/MM/2026]}
+\end{itemize}
+
+\vspace{1.2cm}
+\noindent
+\begin{minipage}[t]{0.48\textwidth}
+  \centering
+  \textbf{FACULTY DEAN / DEPARTMENT CHAIR}\\[2.2cm]
+  \textit{(Signature and full name)}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+  \centering
+  Ho Chi Minh City, \texttt{[DD/MM/2026]}\\
+  \textbf{THESIS ADVISOR}\\[2.2cm]
+  \textbf{Ph.D. Nguyễn Lê Duy Lai}
+\end{minipage}

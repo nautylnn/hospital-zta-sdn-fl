@@ -1,0 +1,31 @@
+\chapter{Federated Learning-Based Intrusion Detection System}
+\label{ch:fl_ids}
+
+% [TODO - Chapter Owner: AI / FL Team Member]
+% Implement and document Phase 3 FL-IDS design, datasets, preprocessing, neural models,
+% FedAvg aggregation pipeline, and alert output schema.
+
+\section{FL-IDS Architecture in the Hospital Topology}
+\label{sec:fl_architecture}
+% Explain placement of FL clients at edge sensors (DMZ, Clinical, Paraclinical) and the
+% FL aggregation server inside VLAN 400 / Server management segment.
+
+\section{Datasets and Feature Engineering}
+\label{sec:fl_datasets}
+% Document benchmark datasets (e.g., CIC-IDS2017 / NSL-KDD / BoT-IoT / synthetic hospital
+% flows), feature selection, normalization, class-imbalance handling, and non-IID partitioning.
+
+\section{Deep Learning Detection Model Design}
+\label{sec:fl_model}
+% Present model architecture (e.g., 1D-CNN, MLP, or CNN-BiLSTM following \cite{javeed2024federated}),
+% hyperparameters, loss function, and lightweight inference considerations for edge sensors.
+
+\section{Federated Training and Aggregation Protocol}
+\label{sec:fl_training}
+% Detail Flower / PyTorch FedAvg workflow, communication rounds, local epochs, weight
+% serialization, and convergence behavior without raw packet sharing (\cite{mcmahan2017communication}).
+
+\section{Alert Generation and Interface to the Policy Engine}
+\label{sec:fl_alert_interface}
+% Define JSON/syslog alert schema (source IP, target VLAN, attack class, confidence score)
+% pushed to the ZTA-SDN Policy Decision Point (PDP).

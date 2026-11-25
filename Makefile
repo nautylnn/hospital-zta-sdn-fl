@@ -4,6 +4,7 @@
 #   make validate
 #   make check-lab ENV=member1_local
 #   make deploy-step1 ENV=member1_local
+#   make deploy-step1 ENV=member2_local
 #   make verify-step1 ENV=lead_lite
 # ==============================================================================
 
@@ -20,7 +21,7 @@ PLAYBOOK_DIR := infra/ansible/playbooks
 
 help: ## Hien thi danh sach lenh ho tro
 	@echo "Hospital ZTA-SDN-FL Pipeline (ENV=$(ENV))"
-	@echo "Profiles hop le: member1_local | lead_lite | cloud_full"
+	@echo "Profiles hop le: member1_local | member2_local | lead_lite | cloud_full"
 	@echo ""
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  make %-18s %s\n", $$1, $$2}'
 

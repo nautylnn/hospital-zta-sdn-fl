@@ -1,0 +1,26 @@
+\chapter{Zero Trust Architecture and SDN Integration}
+\label{ch:zta_sdn_integration}
+
+% [TODO - Chapter Owner: Network / SDN Team Member]
+% Document Phase 2 ZTA-SDN enforcement plane: SPAN mirroring, Suricata/WAF telemetry,
+% Trust Engine / PDP logic, SDN Controller flow installation, and automated containment.
+
+\section{Control and Data Plane Integration Topology}
+\label{sec:zta_sdn_topology}
+% Show how Cisco distribution/access SPAN traffic feeds Suricata and FL sensors, and how
+% OpenFlow PEPs (OVS bridges / SDN switches) enforce traffic policies in VLAN 400.
+
+\section{Policy Decision Point (PDP) and Trust Scoring Engine}
+\label{sec:pdp_trust_engine}
+% Formulate trust score evaluation combining device identity (AD/LDAP/NetBox), zone
+% context, OWASP CRS alerts, Suricata signatures, and FL-IDS anomaly confidence (\cite{xu2025zero}).
+
+\section{Policy Enforcement Points (PEPs) and Dynamic Flow Control}
+\label{sec:pep_flow_control}
+% Describe OpenFlow rules installed by the SDN Controller: allow, rate-limit, redirect to
+% honeypot/inspection, and dynamic host quarantine.
+
+\section{Closed-Loop Automated Incident Response Workflow}
+\label{sec:closed_loop_workflow}
+% Trace the end-to-end closed loop from packet capture -> inference -> trust degradation ->
+% SDN flow drop/quarantine -> SIEM logging (\cite{alanazi2026edgeguard,khan2025integrating}).

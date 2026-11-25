@@ -25,6 +25,7 @@ hospital-zta-sdn-fl/
 │       ├── requirements.yml         # cisco.ios, ansible.posix
 │       ├── inventories/
 │       │   ├── member1_local/       # TH3: Máy Member 1 (192.168.139.0/24 - Full 7 Switch)
+│       │   ├── member2_local/       # TH3: Máy Member 2 (192.168.100.0/24 - Đổi theo VMnet8 máy Member 2)
 │       │   ├── lead_lite/           # TH3: Laptop 16GB Nhóm trưởng (192.168.5.0/24 - Nhánh gọn)
 │       │   └── cloud_full/          # TH1a/TH2: Server Trường / Cloud (10.99.0.0/24 + Tailscale)
 │       ├── templates/
@@ -60,7 +61,7 @@ So với bản triển khai ban đầu trong `hospital_network/`, Bước 1 đã
 3. **Bảo vệ vùng quản trị OOB (`VLAN 999`):** Thêm ACL `CLINICAL_PROTECT_OOB` lên các VLAN lâm sàng (`10, 20, 30, 60, 70, 80`) và áp dụng Standard ACL **`OOB_VTY_ONLY`** lên `line vty 0 15` của cả 7 Switch (chỉ nhận SSH từ OOB hoặc Tailscale CGNAT).
 4. **Chuẩn hóa số liệu SSOT:** Sửa thống nhất **12 VLAN**, chuẩn hóa DMZ là **`VLAN 210`**, xóa bỏ đường dẫn tuyệt đối cá nhân trong `~/.bashrc`, tách `ansible_connection` sạch giữa Switch Cisco và Linux Server.
 5. **Tự động hóa `HOSPITAL-SERVERS` (`02_servers_base.yml`):** Biến các bước gõ tay trước đây (Netplan `.200.10`–`.13`, `dnsmasq` cho tất cả client VLAN, Docker, dịch vụ Mock IoT HTTP) thành playbook Jinja2 chạy trực tiếp từ `design/network_spec.yml`.
-6. **Khóa Hợp đồng JSON (`contracts/`) & Tách 3 Profile (`inventories/`):** Giúp chạy ngay trên máy 16GB (`lead_lite` / `member1_local`) và sẵn sàng chuyển lên Server Trường/Cloud (`cloud_full`) không cần sửa playbook.
+6. **Khóa Hợp đồng JSON (`contracts/`) & Tách 4 Profile (`inventories/`):** Giúp chạy ngay trên máy Member 1 (`member1_local`), Member 2 (`member2_local`), laptop 16GB (`lead_lite`), và sẵn sàng chuyển lên Server Trường/Cloud (`cloud_full`) không cần sửa playbook.
 
 ---
 
@@ -120,8 +121,13 @@ ansible-galaxy collection install -r infra/ansible/requirements.yml
 
 ### C. Cập nhật IP & Chạy triển khai / kiểm thử trên Lab thật
 
-1. Mở `infra/ansible/inventories/<profile>/hosts.ini` (`member1_local`, `lead_lite`, hoặc `cloud_full`), sửa dòng `HOSPITAL-SERVERS ansible_host=...` cho khớp với **IP của card `ens34`** trên VM `HOSPITAL-SERVERS` (xem bằng lệnh `ip -4 a show ens34`).
+1. Mở `infra/ansible/inventories/<profile>/hosts.ini` (`member1_local`, `member2_local`, `lead_lite`, hoặc `cloud_full`), sửa dòng `HOSPITAL-SERVERS ansible_host=...` cho khớp với **IP của card `ens34`** trên VM `HOSPITAL-SERVERS` (xem bằng lệnh `ip -4 a show ens34`).
 2. Kích hoạt `source ~/iac_venv/bin/activate` trong `~/hospital-zta-sdn-fl` và chạy theo profile tương ứng:
+
+> **Hướng dẫn nhanh cho Member 2 (chạy độc lập bằng `ENV=member2_local`):**
+> 1. Sau khi `git pull`, kiểm tra dải `VMnet8` (NAT) trên máy bạn (trong VMware *Virtual Network Editor* hoặc lệnh `ip -4 a show ens34` trên VM Ubuntu).
+> 2. Thay dải mẫu `192.168.100` trong cả `infra/ansible/inventories/member2_local/hosts.ini` và `oob_network` của `infra/ansible/inventories/member2_local/group_vars/all.yml` bằng subnet `VMnet8` thực tế của máy bạn (và điền đúng IP `ens34` vào dòng `HOSPITAL-SERVERS`).
+> 3. Nếu máy có 16GB RAM, có thể tạm thêm dấu `#` trước `SW-CORE-02`, `SW-BLD-A`, `SW-BLD-B`, `SW-DMZ` trong `member2_local/hosts.ini`; sau đó chạy toàn bộ các lệnh bên dưới với `ENV=member2_local`.
 
 ```bash
 # Nếu user VM HOSPITAL-SERVERS khác 'labadmin' (ví dụ Member 1 dùng 'lemin'):
