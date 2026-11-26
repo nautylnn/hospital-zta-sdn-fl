@@ -258,7 +258,10 @@ security_acls:
     - "permit ip any any"
 
   IOMT_ZTA_BASELINE:
+    # 0. Cho phép gói tin HSRP Hello giữa 2 Core Switch (tránh lỗi HSRP Split-Brain)
+    - "permit udp 192.168.180.0 0.0.0.255 host 224.0.0.2 eq 1985"
     # 1. Cho phép xin/gia hạn IP DHCP từ Server 3
+    - "permit udp any eq bootpc host 255.255.255.255 eq bootps"
     - "permit udp any host 192.168.200.12 eq bootps"
     # 2. Chỉ cho phép giao tiếp đúng cổng dịch vụ y tế tới Server 3 (.200.12) & SIEM (.200.13)
     - "permit tcp 192.168.180.0 0.0.0.255 host 192.168.200.12 eq 8080"
