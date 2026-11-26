@@ -58,6 +58,8 @@
       cisco.ios.ios_config:
         lines:
           - ip routing
+          - no ip cef
+          - mac address-table aging-time 14400
           - "spanning-tree mode {{ global_settings.stp_mode }}"
           - "spanning-tree vlan {{ stp_load_balancing[inventory_hostname].root_primary_vlans }} priority 24576"
           - "spanning-tree vlan {{ stp_load_balancing[inventory_hostname].root_secondary_vlans }} priority 28672"

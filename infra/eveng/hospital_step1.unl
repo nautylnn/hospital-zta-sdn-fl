@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<lab name="Test" version="1" scripttimeout="300" lock="0">
+  <topology>
+    <nodes>
+      <node id="1" name="SWITCH-CORE-01" type="qemu" template="viosl2" image="viosl2-15.2.4.55e" console="telnet" cpu="1" cpulimit="0" ram="1024" ethernet="8" uuid="6d4fa585-28cd-42c5-82a8-d40c37082995" qemu_options="-machine type=pc,accel=kvm -serial mon:stdio -nographic -no-user-config -nodefaults -rtc base=utc -cpu host" qemu_version="2.4.0" qemu_arch="x86_64" delay="0" icon="Switch-2D-L3-Generic-S.svg" config="0" left="528" top="450">
+        <interface id="0" name="Gi0/0" type="ethernet" network_id="1"/>
+        <interface id="2" name="Gi0/2" type="ethernet" network_id="2"/>
+        <interface id="3" name="Gi0/3" type="ethernet" network_id="3"/>
+        <interface id="4" name="Gi1/0" type="ethernet" network_id="6"/>
+        <interface id="5" name="Gi1/1" type="ethernet" network_id="7"/>
+        <interface id="6" name="Gi1/2" type="ethernet" network_id="9"/>
+      </node>
+      <node id="2" name="SWITCH-CORE-02" type="qemu" template="viosl2" image="viosl2-15.2.4.55e" console="telnet" cpu="1" cpulimit="0" ram="1024" ethernet="8" uuid="2b693848-7719-4685-80d8-43fed9fd22f0" qemu_options="-machine type=pc,accel=kvm -serial mon:stdio -nographic -no-user-config -nodefaults -rtc base=utc -cpu host" qemu_version="2.4.0" qemu_arch="x86_64" delay="0" icon="Switch-2D-L3-Generic-S.svg" config="0" left="792" top="450">
+        <interface id="0" name="Gi0/0" type="ethernet" network_id="1"/>
+        <interface id="2" name="Gi0/2" type="ethernet" network_id="2"/>
+        <interface id="3" name="Gi0/3" type="ethernet" network_id="4"/>
+        <interface id="4" name="Gi1/0" type="ethernet" network_id="5"/>
+        <interface id="5" name="Gi1/1" type="ethernet" network_id="8"/>
+        <interface id="6" name="Gi1/2" type="ethernet" network_id="10"/>
+      </node>
+      <node id="3" name="SWITCH-BLD-A" type="qemu" template="viosl2" image="viosl2-15.2.4.55e" console="telnet" cpu="1" cpulimit="0" ram="1024" ethernet="8" uuid="7b603675-efb5-48d5-9f06-8fc5219c0950" qemu_options="-machine type=pc,accel=kvm -serial mon:stdio -nographic -no-user-config -nodefaults -rtc base=utc -cpu host" qemu_version="2.4.0" qemu_arch="x86_64" delay="0" icon="Switch-2D-L3-Generic-S.svg" config="0" left="654" top="576">
+        <interface id="0" name="Gi0/0" type="ethernet" network_id="1"/>
+        <interface id="1" name="Gi0/1" type="ethernet" network_id="3"/>
+        <interface id="2" name="Gi0/2" type="ethernet" network_id="4"/>
+        <interface id="3" name="Gi0/3" type="ethernet" network_id="11"/>
+        <interface id="6" name="Gi1/2" type="ethernet" network_id="13"/>
+      </node>
+      <node id="4" name="SWITCH-BLD-B" type="qemu" template="viosl2" image="viosl2-15.2.4.55e" console="telnet" cpu="1" cpulimit="0" ram="1024" ethernet="8" uuid="e3eaea6b-5f26-47fa-b2b4-30e7274da0a5" qemu_options="-machine type=pc,accel=kvm -serial mon:stdio -nographic -no-user-config -nodefaults -rtc base=utc -cpu host" qemu_version="2.4.0" qemu_arch="x86_64" delay="0" icon="Switch-2D-L3-Generic-S.svg" config="0" left="672" top="345">
+        <interface id="0" name="Gi0/0" type="ethernet" network_id="1"/>
+        <interface id="1" name="Gi0/1" type="ethernet" network_id="6"/>
+        <interface id="2" name="Gi0/2" type="ethernet" network_id="5"/>
+        <interface id="3" name="Gi0/3" type="ethernet" network_id="12"/>
+      </node>
+      <node id="5" name="SWITCH-IOMT" type="qemu" template="viosl2" image="viosl2-15.2.4.55e" console="telnet" cpu="1" cpulimit="0" ram="1024" ethernet="8" uuid="db003459-b7ad-49e7-9c8f-2d5c2615523e" qemu_options="-machine type=pc,accel=kvm -serial mon:stdio -nographic -no-user-config -nodefaults -rtc base=utc -cpu host" qemu_version="2.4.0" qemu_arch="x86_64" delay="0" icon="Switch-2D-L3-Generic-S.svg" config="0" left="657" top="705">
+        <interface id="0" name="Gi0/0" type="ethernet" network_id="1"/>
+        <interface id="1" name="Gi0/1" type="ethernet" network_id="7"/>
+        <interface id="2" name="Gi0/2" type="ethernet" network_id="8"/>
+        <interface id="3" name="Gi0/3" type="ethernet" network_id="14"/>
+      </node>
+      <node id="6" name="SWITCH-DC" type="qemu" template="viosl2" image="viosl2-15.2.4.55e" console="telnet" cpu="1" cpulimit="0" ram="1024" ethernet="8" uuid="b5898695-3be9-42c9-b7ec-6afac9616a47" qemu_options="-machine type=pc,accel=kvm -serial mon:stdio -nographic -no-user-config -nodefaults -rtc base=utc -cpu host" qemu_version="2.4.0" qemu_arch="x86_64" delay="0" icon="Switch-2D-L3-Generic-S.svg" config="0" left="732" top="831">
+        <interface id="0" name="Gi0/0" type="ethernet" network_id="1"/>
+        <interface id="1" name="Gi0/1" type="ethernet" network_id="9"/>
+        <interface id="2" name="Gi0/2" type="ethernet" network_id="10"/>
+        <interface id="5" name="Gi1/1" type="ethernet" network_id="15"/>
+      </node>
+      <node id="7" name="SWITCH-DMZ" type="qemu" template="viosl2" image="viosl2-15.2.4.55e" console="telnet" cpu="1" cpulimit="0" ram="1024" ethernet="8" uuid="f5c6521f-b20c-4345-91f2-a8e2bc7685b9" qemu_options="-machine type=pc,accel=kvm -serial mon:stdio -nographic -no-user-config -nodefaults -rtc base=utc -cpu host" qemu_version="2.4.0" qemu_arch="x86_64" delay="0" icon="Switch-2D-L3-Generic-S.svg" config="0" left="855" top="108">
+        <interface id="0" name="Gi0/0" type="ethernet" network_id="1"/>
+      </node>
+      <node id="8" name="PC-BLD-A" type="vpcs" template="vpcs" image="" ethernet="1" delay="0" icon="PC-2D-Desktop-Generic-S.svg" config="0" left="435" top="585">
+        <interface id="0" name="eth0" type="ethernet" network_id="11"/>
+      </node>
+      <node id="9" name="PC-BLD-B" type="vpcs" template="vpcs" image="" ethernet="1" delay="0" icon="PC-2D-Desktop-Generic-S.svg" config="0" left="435" top="351">
+        <interface id="0" name="eth0" type="ethernet" network_id="12"/>
+      </node>
+      <node id="10" name="IOMT-MONITOR" type="vpcs" template="vpcs" image="" ethernet="1" delay="0" icon="PC-2D-Desktop-Generic-S.svg" config="0" left="423" top="711">
+        <interface id="0" name="eth0" type="ethernet" network_id="14"/>
+      </node>
+      <node id="11" name="PC-GUEST-A" type="vpcs" template="vpcs" image="" ethernet="1" delay="0" icon="PC-2D-Desktop-Generic-S.svg" config="0" left="918" top="582">
+        <interface id="0" name="eth0" type="ethernet" network_id="13"/>
+      </node>
+    </nodes>
+    <networks>
+      <network id="1" type="pnet0" name="Management(Cloud0)" left="660" top="267" visibility="1" icon="01-Cloud-Default.svg"/>
+      <network id="2" type="bridge" name="Net-SWITCH-CORE-01iface_2" left="471" top="391" visibility="0" icon="lan.png"/>
+      <network id="3" type="bridge" name="Net-SWITCH-BLD-Aiface_1" left="753" top="484" visibility="0" icon="lan.png"/>
+      <network id="4" type="bridge" name="Net-SWITCH-BLD-Aiface_2" left="753" top="484" visibility="0" icon="lan.png"/>
+      <network id="5" type="bridge" name="Net-SWITCH-BLD-Biface_2" left="738" top="385" visibility="0" icon="lan.png"/>
+      <network id="6" type="bridge" name="Net-SWITCH-BLD-Biface_1" left="738" top="385" visibility="0" icon="lan.png"/>
+      <network id="7" type="bridge" name="Net-SWITCH-IOMTiface_1" left="696" top="760" visibility="0" icon="lan.png"/>
+      <network id="8" type="bridge" name="Net-SWITCH-IOMTiface_2" left="696" top="760" visibility="0" icon="lan.png"/>
+      <network id="9" type="bridge" name="Net-SWITCH-DCiface_1" left="726" top="862" visibility="0" icon="lan.png"/>
+      <network id="10" type="bridge" name="Net-SWITCH-CORE-02iface_6" left="855" top="490" visibility="0" icon="lan.png"/>
+      <network id="11" type="bridge" name="Net-PC-BLD-Aiface_0" left="546" top="628" visibility="0" icon="lan.png"/>
+      <network id="13" type="bridge" name="Net-PC-GUEST-Aiface_0" left="978" top="622" visibility="0" icon="lan.png"/>
+      <network id="12" type="bridge" name="Net-PC-BLD-Biface_0" left="453" top="388" visibility="0" icon="lan.png"/>
+      <network id="14" type="bridge" name="Net-IOMT-MONITORiface_0" left="486" top="766" visibility="0" icon="lan.png"/>
+      <network id="15" type="pnet1" name="Cloud1" left="573" top="837" visibility="1" icon="01-Cloud-Default.svg"/>
+    </networks>
+  </topology>
+  <objects>
+    <configs>
+      <config id="7">IQohIExhc3QgY29uZmlndXJhdGlvbiBjaGFuZ2UgYXQgMTA6Mzc6MDggVVRDIEZyaSBOb3YgMTMgMjAyNgohCnZlcnNpb24gMTUuMgpzZXJ2aWNlIHRpbWVzdGFtcHMgZGVidWcgZGF0ZXRpbWUgbXNlYwpzZXJ2aWNlIHRpbWVzdGFtcHMgbG9nIGRhdGV0aW1lIG1zZWMKbm8gc2VydmljZSBwYXNzd29yZC1lbmNyeXB0aW9uCnNlcnZpY2UgY29tcHJlc3MtY29uZmlnCiEKaG9zdG5hbWUgU1dJVENILURNWgohCmJvb3Qtc3RhcnQtbWFya2VyCmJvb3QtZW5kLW1hcmtlcgohCiEKZW5hYmxlIHNlY3JldCA1ICQxJGlLeVUkbzBsM3JCSGsuRjFFNVQ5LlhnczZnLgohCnVzZXJuYW1lIGFkbWluIHByaXZpbGVnZSAxNSBzZWNyZXQgNSAkMSRRZ3kyJGtlanJOU0ZFQVptRkk3WGk3Z3h1aS4Kbm8gYWFhIG5ldy1tb2RlbAohCiEKIQohCiEKIQohCiEKaXAgZG9tYWluLW5hbWUgaG9zcGl0YWwubG9jYWwKaXAgY2VmCm5vIGlwdjYgY2VmCiEKIQohCnNwYW5uaW5nLXRyZWUgbW9kZSByYXBpZC1wdnN0CnNwYW5uaW5nLXRyZWUgZXh0ZW5kIHN5c3RlbS1pZAohCnZsYW4gaW50ZXJuYWwgYWxsb2NhdGlvbiBwb2xpY3kgYXNjZW5kaW5nCiEKISAKIQohCiEKIQohCiEKIQohCiEKIQohCiEKaW50ZXJmYWNlIEdpZ2FiaXRFdGhlcm5ldDAvMQogbm8gc2h1dGRvd24KIG1lZGlhLXR5cGUgcmo0NQogbmVnb3RpYXRpb24gYXV0bwohCmludGVyZmFjZSBHaWdhYml0RXRoZXJuZXQwLzIKIG5vIHNodXRkb3duCiBtZWRpYS10eXBlIHJqNDUKIG5lZ290aWF0aW9uIGF1dG8KIQppbnRlcmZhY2UgR2lnYWJpdEV0aGVybmV0MC8zCiBubyBzaHV0ZG93bgogbWVkaWEtdHlwZSByajQ1CiBuZWdvdGlhdGlvbiBhdXRvCiEKaW50ZXJmYWNlIEdpZ2FiaXRFdGhlcm5ldDAvMAogbm8gc2h1dGRvd24KIGRlc2NyaXB0aW9uIE9PQl9NR01UX1ZMQU45OTlfVE9fQU5TSUJMRQogbm8gc3dpdGNocG9ydAogaXAgYWRkcmVzcyAxOTIuMTY4LjEzOS41NyAyNTUuMjU1LjI1NS4wCiBuZWdvdGlhdGlvbiBhdXRvCiEKaW50ZXJmYWNlIEdpZ2FiaXRFdGhlcm5ldDEvMAogbm8gc2h1dGRvd24KIG1lZGlhLXR5cGUgcmo0NQogbmVnb3RpYXRpb24gYXV0bwohCmludGVyZmFjZSBHaWdhYml0RXRoZXJuZXQxLzEKIG5vIHNodXRkb3duCiBtZWRpYS10eXBlIHJqNDUKIG5lZ290aWF0aW9uIGF1dG8KIQppbnRlcmZhY2UgR2lnYWJpdEV0aGVybmV0MS8yCiBubyBzaHV0ZG93bgogbWVkaWEtdHlwZSByajQ1CiBuZWdvdGlhdGlvbiBhdXRvCiEKaW50ZXJmYWNlIEdpZ2FiaXRFdGhlcm5ldDEvMwogbm8gc2h1dGRvd24KIG1lZGlhLXR5cGUgcmo0NQogbmVnb3RpYXRpb24gYXV0bwohCmlwIGZvcndhcmQtcHJvdG9jb2wgbmQKIQpubyBpcCBodHRwIHNlcnZlcgpubyBpcCBodHRwIHNlY3VyZS1zZXJ2ZXIKIQppcCBzc2ggdmVyc2lvbiAyCiEKIQohCiEKIQpjb250cm9sLXBsYW5lCiEKYmFubmVyIGV4ZWMgXkMKKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKKiBJT1N2IGlzIHN0cmljdGx5IGxpbWl0ZWQgdG8gdXNlIGZvciBldmFsdWF0aW9uLCBkZW1vbnN0cmF0aW9uIGFuZCBJT1MgICoKKiBlZHVjYXRpb24uIElPU3YgaXMgcHJvdmlkZWQgYXMtaXMgYW5kIGlzIG5vdCBzdXBwb3J0ZWQgYnkgQ2lzY28ncyAgICAgICoKKiBUZWNobmljYWwgQWR2aXNvcnkgQ2VudGVyLiBBbnkgdXNlIG9yIGRpc2Nsb3N1cmUsIGluIHdob2xlIG9yIGluIHBhcnQsICoKKiBvZiB0aGUgSU9TdiBTb2Z0d2FyZSBvciBEb2N1bWVudGF0aW9uIHRvIGFueSB0aGlyZCBwYXJ0eSBmb3IgYW55ICAgICAgICoKKiBwdXJwb3NlcyBpcyBleHByZXNzbHkgcHJvaGliaXRlZCBleGNlcHQgYXMgb3RoZXJ3aXNlIGF1dGhvcml6ZWQgYnkgICAgICoKKiBDaXNjbyBpbiB3cml0aW5nLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICoKKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKipeQwpiYW5uZXIgaW5jb21pbmcgXkMKKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKKiBJT1N2IGlzIHN0cmljdGx5IGxpbWl0ZWQgdG8gdXNlIGZvciBldmFsdWF0aW9uLCBkZW1vbnN0cmF0aW9uIGFuZCBJT1MgICoKKiBlZHVjYXRpb24uIElPU3YgaXMgcHJvdmlkZWQgYXMtaXMgYW5kIGlzIG5vdCBzdXBwb3J0ZWQgYnkgQ2lzY28ncyAgICAgICoKKiBUZWNobmljYWwgQWR2aXNvcnkgQ2VudGVyLiBBbnkgdXNlIG9yIGRpc2Nsb3N1cmUsIGluIHdob2xlIG9yIGluIHBhcnQsICoKKiBvZiB0aGUgSU9TdiBTb2Z0d2FyZSBvciBEb2N1bWVudGF0aW9uIHRvIGFueSB0aGlyZCBwYXJ0eSBmb3IgYW55ICAgICAgICoKKiBwdXJwb3NlcyBpcyBleHByZXNzbHkgcHJvaGliaXRlZCBleGNlcHQgYXMgb3RoZXJ3aXNlIGF1dGhvcml6ZWQgYnkgICAgICoKKiBDaXNjbyBpbiB3cml0aW5nLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICoKKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKipeQwpiYW5uZXIgbG9naW4gXkMKKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKKiBJT1N2IGlzIHN0cmljdGx5IGxpbWl0ZWQgdG8gdXNlIGZvciBldmFsdWF0aW9uLCBkZW1vbnN0cmF0aW9uIGFuZCBJT1MgICoKKiBlZHVjYXRpb24uIElPU3YgaXMgcHJvdmlkZWQgYXMtaXMgYW5kIGlzIG5vdCBzdXBwb3J0ZWQgYnkgQ2lzY28ncyAgICAgICoKKiBUZWNobmljYWwgQWR2aXNvcnkgQ2VudGVyLiBBbnkgdXNlIG9yIGRpc2Nsb3N1cmUsIGluIHdob2xlIG9yIGluIHBhcnQsICoKKiBvZiB0aGUgSU9TdiBTb2Z0d2FyZSBvciBEb2N1bWVudGF0aW9uIHRvIGFueSB0aGlyZCBwYXJ0eSBmb3IgYW55ICAgICAgICoKKiBwdXJwb3NlcyBpcyBleHByZXNzbHkgcHJvaGliaXRlZCBleGNlcHQgYXMgb3RoZXJ3aXNlIGF1dGhvcml6ZWQgYnkgICAgICoKKiBDaXNjbyBpbiB3cml0aW5nLiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICoKKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKipeQwohCmxpbmUgY29uIDAKbGluZSBhdXggMApsaW5lIHZ0eSAwIDQKIGV4ZWMtdGltZW91dCAzMCAwCiBsb2dpbiBsb2NhbAogdHJhbnNwb3J0IGlucHV0IHNzaApsaW5lIHZ0eSA1IDE1CiBleGVjLXRpbWVvdXQgMzAgMAogbG9naW4gbG9jYWwKIHRyYW5zcG9ydCBpbnB1dCBzc2gKIQo=</config>
+    </configs>
+  </objects>
+</lab>
