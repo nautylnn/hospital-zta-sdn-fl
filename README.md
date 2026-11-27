@@ -4,6 +4,8 @@ Kho mã nguồn mở **Infrastructure as Code (IaC)** cho đồ án tốt nghi�
 
 Repo này hợp nhất toàn bộ nền tảng mạng Cisco & Ansible từ giai đoạn đầu của nhóm thành **Bước 1 (Khung Pipeline Chung)**, giúp cả 3 thành viên làm việc song song và chuyển đổi mượt mà giữa **Laptop cá nhân 16GB (`TH3`)**, **Server Trường (`TH1`)** và **Cloud VM (`TH2`)**.
 
+> 📌 **Theo dõi tiến độ & Kế hoạch phát triển 6 Bước:** Xem tại [docs/KE_HOACH_PHAT_TRIEN_VA_TRACKING.md](docs/KE_HOACH_PHAT_TRIEN_VA_TRACKING.md).
+
 ---
 
 ## 1. Cấu trúc Monorepo
@@ -44,6 +46,9 @@ hospital-zta-sdn-fl/
 │   ├── hospital_apps/               # Server 3 (.200.12) - Member 1 & Nhóm trưởng
 │   └── security_ops/                # Server 4 (.200.13) - Nhóm trưởng
 ├── experiments/                     # Kịch bản tcpreplay & benchmark Chương 5 - Member 2
+├── docs/
+│   ├── LY_THUYET_VA_DINH_NGHIA_PIPELINE.md # Tài liệu lý thuyết, thuật ngữ & hỏi đáp phản biện
+│   └── KE_HOACH_PHAT_TRIEN_VA_TRACKING.md  # Lộ trình 6 bước, thiết kế kỹ thuật & checklist tiến độ
 ├── scripts/
 │   ├── validate_design.py           # Kiểm tra SSOT, bảo mật ACL, JSON schema & đường dẫn (offline)
 │   └── check_lab.sh                 # Kiểm tra nhanh ICMP Ping, SSH & HSRP theo từng profile
