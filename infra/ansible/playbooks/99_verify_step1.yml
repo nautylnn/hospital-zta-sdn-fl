@@ -84,14 +84,24 @@
     - ../../../design/network_spec.yml
 
   tasks:
-    - name: "3.1. Kiem tra dich vu dnsmasq & mock-iot-http dang hoat dong"
-      ansible.builtin.command: "systemctl is-active {{ item }}"
-      loop:
-        - dnsmasq
-        - mock-iot-http
-      register: svc_state
+    - name: "3.1a. Kiem tra dich vu dnsmasq dang hoat dong"
+      ansible.builtin.command: systemctl is-active dnsmasq
+      register: dnsmasq_state
       changed_when: false
-      failed_when: svc_state.stdout != 'active'
+      failed_when: dnsmasq_state.stdout != 'active'
+
+    - name: "3.1b. Kiem tra dich vu HTTP :8080 (mock-iot-http hoac hospital-ehr-api) dang chay"
+      ansible.builtin.shell: |
+        if systemctl is-active --quiet mock-iot-http; then
+          echo "mock-iot-http"
+        elif [ "$(docker inspect -f '{% raw %}{{.State.Running}}{% endraw %}' hospital-ehr-api 2>/dev/null || true)" = "true" ]; then
+          echo "hospital-ehr-api"
+        else
+          exit 1
+        fi
+      register: http_svc_state
+      changed_when: false
+      failed_when: http_svc_state.rc != 0
 
     - name: "3.2. Lay danh sach IP tren card du lieu {{ server_data_interface }}"
       ansible.builtin.command: "ip -4 addr show dev {{ server_data_interface }}"
@@ -105,7 +115,7 @@
         fail_msg: "[FAIL] Card {{ server_data_interface }} thieu IP {{ item.value.ip }} ({{ item.key }})!"
       loop: "{{ dc_servers | dict2items }}"
 
-    - name: "3.4. Xac thuc Mock IoT HTTP Server tra ve ma 200"
+    - name: "3.4. Xac thuc HTTP Server (:8080) tra ve ma 200"
       ansible.builtin.uri:
         url: "http://{{ global_settings.dhcp_server_ip }}:8080"
         status_code: 200

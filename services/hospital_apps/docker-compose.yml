@@ -1,0 +1,16 @@
+services:
+  ehr-api:
+    build: ./ehr_api
+    container_name: hospital-ehr-api
+    restart: unless-stopped
+    ports:
+      - "192.168.200.12:8080:8080"
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: hospital-mqtt-broker
+    restart: unless-stopped
+    ports:
+      - "192.168.200.12:1883:1883"
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro

@@ -40,7 +40,7 @@ jobs:
         run: |
           yamllint -c .yamllint.yml design/ infra/ansible/
 
-      - name: Check Ansible playbook syntax across all Step 1 playbooks
+      - name: Check Ansible playbook syntax across all playbooks
         env:
           ANSIBLE_CONFIG: infra/ansible/ansible.cfg
         run: |
@@ -50,5 +50,7 @@ jobs:
               infra/ansible/playbooks/00_reset_cisco.yml \
               infra/ansible/playbooks/01_core_cisco.yml \
               infra/ansible/playbooks/02_servers_base.yml \
+              infra/ansible/playbooks/03_hospital_apps.yml \
+              infra/ansible/playbooks/98_verify_hospital_apps.yml \
               infra/ansible/playbooks/99_verify_step1.yml
           done

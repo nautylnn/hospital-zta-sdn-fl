@@ -33,15 +33,17 @@ hospital-zta-sdn-fl/
 │       │   ├── dnsmasq.conf.j2
 │       │   └── mock-iot-http.service.j2
 │       └── playbooks/
-│           ├── 00_reset_cisco.yml   # Trả 7 Switch về flash:bootstrap.cfg (serial: 2)
-│           ├── 01_core_cisco.yml    # Đẩy VLAN, Trunk/Access, HSRP, STP, ACL & khóa VTY SSH
-│           ├── 02_servers_base.yml  # Tự động hóa HOSPITAL-SERVERS (Netplan, dnsmasq, Docker, HTTP)
-│           └── 99_verify_step1.yml  # Kiểm thử tự động toàn bộ Switch + Server
-├── services/                        # Khung code từng phân hệ (triển khai ở Bước 2-5)
+│           ├── 00_reset_cisco.yml          # Trả 7 Switch về flash:bootstrap.cfg (serial: 2)
+│           ├── 01_core_cisco.yml           # Đẩy VLAN, Trunk/Access, HSRP, STP, ACL & khóa VTY SSH
+│           ├── 02_servers_base.yml         # Tự động hóa HOSPITAL-SERVERS (Netplan, dnsmasq, Docker, HTTP)
+│           ├── 03_hospital_apps.yml        # Triển khai Server 3: EHR/PACS RBAC API (:8080) & MQTT (:1883)
+│           ├── 98_verify_hospital_apps.yml # Kiểm thử tự động Server 3 (RBAC 401/403/200, /ui & MQTT)
+│           └── 99_verify_step1.yml         # Kiểm thử tự động toàn bộ Switch + Server Bước 1
+├── services/                        # Code các phân hệ triển khai trên Data Center & DMZ
 │   ├── sdn_zta/                     # Server 1 (.200.10) - Nhóm trưởng
 │   ├── fl_engine/                   # Server 2 (.200.11) & Edges - Member 2
 │   ├── dmz_waf/                     # DMZ (.210.3-.4) - Member 1
-│   ├── hospital_apps/               # Server 3 (.200.12) - Member 1 & Nhóm trưởng
+│   ├── hospital_apps/               # Server 3 (.200.12): EHR/PACS API + /ui & MQTT Broker (Bước 2)
 │   └── security_ops/                # Server 4 (.200.13) - Nhóm trưởng
 ├── experiments/                     # Kịch bản tcpreplay & benchmark Chương 5 - Member 2
 ├── scripts/
@@ -151,6 +153,21 @@ make deploy-step1 ENV=member1_local
 # 5. Chạy bộ kiểm thử xác thực tự động Switch + ACL + Server
 make verify-step1 ENV=member1_local
 ```
+
+### C2. Triển khai & kiểm thử Server 3 Hospital Apps (Bước 2 — `192.168.200.12`)
+
+Sau khi `HOSPITAL-SERVERS` đã có cấu hình mạng từ `make deploy-servers`, có thể nâng cấp `192.168.200.12` từ `mock-iot-http` lên **EHR/PACS RBAC API + Web UI offline (`/ui` trên `:8080`)** và **Mosquitto MQTT Broker (`:1883`)**:
+
+```bash
+# Triển khai Server 3 bằng Ansible + Docker Compose (tự dừng mock-iot-http và giữ nguyên GET / -> 200)
+make deploy-hospital-apps ENV=member1_local
+
+# Kiểm thử tự động container, trang offline /ui, RBAC (401/403/200) và MQTT Pub/Sub :1883
+make verify-hospital-apps ENV=member1_local
+```
+
+- Chi tiết endpoint, token mẫu (`doctor-token-123`, `nurse-token-456`, `iomt-token-789`) và hướng dẫn mở Web UI từ EVE-NG xem tại [services/hospital_apps/README.md](services/hospital_apps/README.md).
+- `make verify-step1 ENV=<profile>` tương thích với cả `mock-iot-http` lẫn `hospital-ehr-api` trên cổng `:8080`.
 
 ### D. Xử lý nhanh 3 lỗi thực tế thường gặp ở Bước 1
 

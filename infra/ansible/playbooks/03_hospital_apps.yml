@@ -1,0 +1,90 @@
+---
+- name: "Buoc 2 - Trien khai Server 3 Hospital Apps (EHR/PACS RBAC API & MQTT)"
+  hosts: hospital_servers
+  gather_facts: yes
+  become: yes
+  vars_files:
+    - ../../../design/network_spec.yml
+
+  tasks:
+    - name: "1. Cai dat Docker, Docker Compose, mosquitto-clients va curl"
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - docker-compose-v2
+          - mosquitto-clients
+          - curl
+        state: present
+        update_cache: yes
+
+    - name: "2. Dam bao dich vu Docker dang chay va tu dong khoi dong"
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: "3. Kiem tra systemd unit mock-iot-http (Buoc 1) co ton tai khong"
+      ansible.builtin.stat:
+        path: /etc/systemd/system/mock-iot-http.service
+      register: mock_iot_unit
+
+    - name: "4. Dung va tat mock-iot-http de nhuong cong 8080 cho hospital-ehr-api"
+      ansible.builtin.systemd:
+        name: mock-iot-http
+        state: stopped
+        enabled: no
+      when: mock_iot_unit.stat.exists
+
+    - name: "5. Tao thu muc trien khai /opt/hospital-apps"
+      ansible.builtin.file:
+        path: /opt/hospital-apps
+        state: directory
+        mode: "0755"
+
+    - name: "6. Dong bo ma nguon services/hospital_apps/ vao /opt/hospital-apps"
+      ansible.builtin.copy:
+        src: ../../../services/hospital_apps/
+        dest: /opt/hospital-apps/
+        mode: "0644"
+        directory_mode: "0755"
+
+    - name: "7. Kiem tra container thu cong khong thuoc /opt/hospital-apps"
+      ansible.builtin.shell: |
+        for name in hospital-ehr-api hospital-mqtt-broker; do
+          wd=$(docker inspect -f '{% raw %}{{index .Config.Labels "com.docker.compose.project.working_dir"}}{% endraw %}' "$name" 2>/dev/null || true)
+          if [ -n "$wd" ] && [ "$wd" != "/opt/hospital-apps" ]; then
+            echo "REPLACE:$name"
+          fi
+        done
+      register: legacy_containers
+      changed_when: false
+
+    - name: "8. Go bo container thu cong cu truoc khi chay Compose tu /opt/hospital-apps"
+      ansible.builtin.command: "docker rm -f {{ item | replace('REPLACE:', '') }}"
+      loop: "{{ legacy_containers.stdout_lines }}"
+      when: item is match('^REPLACE:')
+
+    - name: "9. Build va khoi dong EHR/PACS API (:8080) & Mosquitto (:1883)"
+      ansible.builtin.command: docker compose up -d --build
+      args:
+        chdir: /opt/hospital-apps
+      register: compose_up
+      changed_when: >-
+        'Started' in (compose_up.stdout ~ compose_up.stderr)
+        or 'Created' in (compose_up.stdout ~ compose_up.stderr)
+        or 'Recreated' in (compose_up.stdout ~ compose_up.stderr)
+
+    - name: "10. Cho EHR/PACS API tren {{ global_settings.dhcp_server_ip }}:8080 san sang"
+      ansible.builtin.uri:
+        url: "http://{{ global_settings.dhcp_server_ip }}:8080/"
+        status_code: 200
+      register: api_health
+      retries: 10
+      delay: 2
+      until: api_health.status == 200
+
+    - name: "11. Cho MQTT Broker tren {{ global_settings.dhcp_server_ip }}:1883 san sang"
+      ansible.builtin.wait_for:
+        host: "{{ global_settings.dhcp_server_ip }}"
+        port: 1883
+        timeout: 30

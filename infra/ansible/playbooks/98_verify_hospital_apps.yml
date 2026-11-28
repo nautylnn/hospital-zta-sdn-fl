@@ -1,0 +1,106 @@
+---
+- name: "Buoc 2 - Kiem thu tu dong Server 3 Hospital Apps (RBAC API, Offline /ui & MQTT)"
+  hosts: hospital_servers
+  gather_facts: no
+  become: yes
+  vars_files:
+    - ../../../design/network_spec.yml
+
+  tasks:
+    - name: "1. Kiem tra dich vu he thong docker & dnsmasq dang active"
+      ansible.builtin.command: "systemctl is-active {{ item }}"
+      loop:
+        - docker
+        - dnsmasq
+      register: svc_state
+      changed_when: false
+      failed_when: svc_state.stdout != 'active'
+
+    - name: "2. Xac thuc hai Docker container Server 3 dang chay"
+      ansible.builtin.command: "docker inspect -f '{% raw %}{{.State.Running}}{% endraw %}' {{ item }}"
+      loop:
+        - hospital-ehr-api
+        - hospital-mqtt-broker
+      register: container_state
+      changed_when: false
+      failed_when: container_state.stdout | trim != 'true'
+
+    - name: "3. Kiem tra Health Check GET / tra ve HTTP 200"
+      ansible.builtin.uri:
+        url: "http://{{ global_settings.dhcp_server_ip }}:8080/"
+        status_code: 200
+
+    - name: "4. Kiem tra giao dien Web UI offline GET /ui tra ve HTTP 200"
+      ansible.builtin.uri:
+        url: "http://{{ global_settings.dhcp_server_ip }}:8080/ui"
+        status_code: 200
+        return_content: yes
+      register: ui_check
+
+    - name: "5. Xac thuc noi dung trang /ui hop le"
+      ansible.builtin.assert:
+        that:
+          - "'Hospital EHR/PACS' in ui_check.content"
+        fail_msg: "[FAIL] Trang /ui thieu noi dung Hospital EHR/PACS!"
+
+    - name: "6. Kiem tra RBAC: Khong co token vao EHR bi chan HTTP 401"
+      ansible.builtin.uri:
+        url: "http://{{ global_settings.dhcp_server_ip }}:8080/api/v1/ehr/patients"
+        status_code: 401
+
+    - name: "7. Kiem tra RBAC: Token IoMT vao EHR bi tu choi HTTP 403"
+      ansible.builtin.uri:
+        url: "http://{{ global_settings.dhcp_server_ip }}:8080/api/v1/ehr/patients"
+        headers:
+          Authorization: "Bearer iomt-token-789"
+        status_code: 403
+
+    - name: "8. Kiem tra RBAC: Token Bac si xem EHR thanh cong HTTP 200"
+      ansible.builtin.uri:
+        url: "http://{{ global_settings.dhcp_server_ip }}:8080/api/v1/ehr/patients"
+        headers:
+          Authorization: "Bearer doctor-token-123"
+        status_code: 200
+        return_content: yes
+      register: ehr_doc
+
+    - name: "9. Xac thuc du lieu benh nhan BN-001 trong phan hoi EHR"
+      ansible.builtin.assert:
+        that:
+          - "'BN-001' in ehr_doc.content"
+        fail_msg: "[FAIL] Phan hoi EHR khong chua ma benh nhan BN-001!"
+
+    - name: "10. Kiem tra IoMT gui du lieu sinh hieu POST /api/v1/iomt/telemetry (HTTP 200)"
+      ansible.builtin.uri:
+        url: "http://{{ global_settings.dhcp_server_ip }}:8080/api/v1/iomt/telemetry"
+        method: POST
+        headers:
+          Authorization: "Bearer iomt-token-789"
+        body_format: json
+        body:
+          device_id: "VERIFY-MON-01"
+          heart_rate: 75
+          spo2: 99
+        status_code: 200
+
+    - name: "11. Kiem tra Bac si xem lich su IoMT GET /api/v1/iomt/telemetry (HTTP 200)"
+      ansible.builtin.uri:
+        url: "http://{{ global_settings.dhcp_server_ip }}:8080/api/v1/iomt/telemetry"
+        headers:
+          Authorization: "Bearer doctor-token-123"
+        status_code: 200
+
+    - name: "12. Kiem tra MQTT Pub/Sub end-to-end tren {{ global_settings.dhcp_server_ip }}:1883"
+      ansible.builtin.shell: |
+        timeout 8 bash -c '
+          mosquitto_sub -h {{ global_settings.dhcp_server_ip }} -p 1883 -t "hospital/verify/ping" -C 1 > /tmp/mqtt_verify.out &
+          sub_pid=$!
+          sleep 1
+          mosquitto_pub -h {{ global_settings.dhcp_server_ip }} -p 1883 -t "hospital/verify/ping" -m "mqtt-ok"
+          wait "$sub_pid"
+        '
+        cat /tmp/mqtt_verify.out
+        rm -f /tmp/mqtt_verify.out
+      register: mqtt_check
+      changed_when: false
+      failed_when: mqtt_check.rc != 0 or (mqtt_check.stdout | trim) != 'mqtt-ok'
